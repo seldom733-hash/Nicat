@@ -1,0 +1,243 @@
+{
+  "common": {
+    "appName": "Nicat",
+    "loading": "Yüklənir...",
+    "error": "Xəta",
+    "save": "Saxla",
+    "cancel": "Ləğv et",
+    "delete": "Sil",
+    "edit": "Düzəliş et",
+    "search": "Axtarış",
+    "filter": "Filtr",
+    "clear": "Təmizlə",
+    "back": "Geri",
+    "next": "İrəli",
+    "submit": "Göndər",
+    "confirm": "Təsdiq et",
+    "or": "və ya",
+    "and": "və"
+  },
+  "nav": {
+    "explore": "Kəşf et",
+    "createTour": "Tur yarat",
+    "chats": "Söhbətlər",
+    "profile": "Profil",
+    "dashboard": "İdarə paneli",
+    "signIn": "Daxil ol",
+    "signUp": "Qeydiyyat",
+    "signOut": "Çıxış",
+    "searchPlaceholder": "Turlar, ölkələr, şəhərlər axtarın...",
+    "searchPlaceholderMobile": "Turlar axtarın..."
+  },
+  "home": {
+    "hero": {
+      "badge": "🌍 Qlobal Səyahət Platforması",
+      "title": "<highlight>Nicat</highlight> ilə dünyanı kəşf edin",
+      "subtitle": "Dünyanın hər yerində qrup səyahətləri tapın, yaradın və qoşulun",
+      "searchPlaceholder": "Haraya getmək istəyirsiniz?",
+      "searchButton": "Turlar tapın",
+      "tours": "Tur",
+      "countries": "Ölkə",
+      "travelers": "Səyyah"
+    },
+    "categories": {
+      "title": "Populyar kateqoriyalar",
+      "subtitle": "Sizi maraqlandıran səyahət növünü seçin",
+      "adventure": "Macəra",
+      "cultural": "Mədəniyyət",
+      "nature": "Təbiət",
+      "beach": "Çimərlik",
+      "foodWine": "Yemək və şərab",
+      "photography": "Fotoqrafiya"
+    },
+    "featured": {
+      "title": "Seçilmiş turlar",
+      "subtitle": "Təsdiq edilmiş təşkilatçılardan ən yaxşı təkliflər",
+      "viewAll": "Bütün turlar",
+      "noTours": "Tezliklə turlar olacaq. Birinci siz olun!",
+      "perPerson": "adam başına"
+    },
+    "features": {
+      "title": "Niyə Nicat seçməlisiniz?",
+      "subtitle": "Biz səyahətləri əlçatan, təhlükəsiz və xoş edirik",
+      "globalTours": {
+        "title": "Qlobal turlar",
+        "description": "50+ ölkədə 1000-dən çox tur"
+      },
+      "groupTravel": {
+        "title": "Qrup səyahətləri",
+        "description": "Ortаq macəralar üçün bənzərsiz səyyahlar tapın"
+      },
+      "securePayments": {
+        "title": "Təhlükəsiz ödənişlər",
+        "description": "Stripe Connect və məlumat şifrələməsi ilə qorunur"
+      },
+      "realtimeChat": {
+        "title": "Real vaxt söhbəti",
+        "description": "Səyahət zamanı yoldaşlarınızla əlaqə saxlayın"
+      }
+    },
+    "cta": {
+      "title": "Macəralara hazırsınız?",
+      "subtitle": "Dünyanın hər yerindən minlərlə səyyaha qoşulun",
+      "startJourney": "Səyahətinizi başladın",
+      "browseTours": "Turlara baxın"
+    }
+  },
+  "footer": {
+    "about": "Qrup səyahətlərini kəşf etmək, yaratmaq və qoşulmaq üçün qlobal platforma. Mükəmməl turu tapın və ya özünüzü yaradın.",
+    "platform": "Platforma",
+    "explore": "Kəşf et",
+    "tours": "Turlar",
+    "becomeHost": "Təşkilatçı olun",
+    "contact": "Əlaqə",
+    "copyright": "© {year} Nicat. Bütün hüquqlar qorunur."
+  },
+  "auth": {
+    "login": {
+      "title": "Xoş gəlmisiniz",
+      "subtitle": "Hesabınıza daxil olun",
+      "email": "Elektron poçt",
+      "password": "Şifrə",
+      "rememberMe": "Məni xatırla",
+      "forgotPassword": "Şifrəni unutdunuz?",
+      "signIn": "Daxil ol",
+      "noAccount": "Hesabınız yoxdur?",
+      "signUp": "Qeydiyyatdan keçin",
+      "orContinueWith": "Və ya davam edin"
+    },
+    "register": {
+      "title": "Hesab yaradın",
+      "subtitle": "Səyahətçilər cəmiyyətimizə qoşulun",
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "Elektron poçt",
+      "password": "Şifrə",
+      "confirmPassword": "Şifrəni təsdiq edin",
+      "createAccount": "Hesab yaradın",
+      "hasAccount": "Hesabınız var?",
+      "signIn": "Daxil ol"
+    }
+  },
+  "tours": {
+    "create": {
+      "title": "Yeni tur yaradın",
+      "basicInfo": "Əsas məlumatlar",
+      "tourName": "Turun adı",
+      "tourNamePlaceholder": "məsələn, Möhtəşəm Bali Macərası",
+      "description": "Təsvir",
+      "descriptionPlaceholder": "Tursunuzu təsvir edin...",
+      "location": "Məkan",
+      "country": "Ölkə",
+      "city": "Şəhər",
+      "pricing": "Qiymətlər",
+      "basePrice": "Əsas qiymət",
+      "currency": "Valyuta",
+      "dates": "Tarixlər",
+      "startDate": "Başlama tarixi",
+      "endDate": "Bitmə tarixi",
+      "maxParticipants": "Maksimum iştirakçı",
+      "media": "Media",
+      "uploadPhotos": "Şəkillər yükləyin",
+      "dragDrop": "Şəkilləri bura sürükləyin və ya seçin",
+      "createTour": "Tur yaradın"
+    },
+    "detail": {
+      "bookNow": "Rezervasiya edin",
+      "pricePerPerson": "Adam başına qiymət",
+      "included": "Daxildir",
+      "notIncluded": "Daxil deyil",
+      "itinerary": "Marşrut",
+      "reviews": "Rəylər",
+      "host": "Təşkilatçı",
+      "day": "Gün"
+    }
+  },
+  "booking": {
+    "title": "Tur bronu",
+    "passengers": "Sərnişinlər",
+    "addPassenger": "Sərnişin əlavə et",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "passport": "Pasport nömrəsi",
+    "payment": "Ödəniş",
+    "total": "Cəmi",
+    "confirmBooking": "Bronu təsdiq edin",
+    "confirmation": {
+      "title": "Bron təsdiq edildi!",
+      "subtitle": "Macəranız gözləyir",
+      "tourDetails": "Tur təfərrüatları",
+      "bookingId": "Bron ID-si",
+      "viewDashboard": "İdarə panelinə baxın",
+      "backToHome": "Əsas səhifəyə qayıdın"
+    },
+    "tourDetails": "Tur təfərrüatları"
+  },
+  "explore": {
+    "title": "Turları kəşf edin",
+    "filters": {
+      "category": "Kateqoriya",
+      "priceRange": "Qiymət aralığı",
+      "duration": "Müddət",
+      "rating": "Reytinq",
+      "clearFilters": "Filtri təmizlə",
+      "daysUnit": "gün",
+      "title": "Filtrlər",
+      "countriesAndCities": "Ölkələr və şəhərlər",
+      "services": "Xidmətlər",
+      "searchCountry": "Ölkə axtar...",
+      "searchServices": "Xidmət axtar...",
+      "citiesUnit": "şəhər",
+      "clearAllFilters": "Bütün filtrləri təmizlə",
+      "noResults": "Nəticə tapılmadı"
+    },
+    "results": "tur tapıldı",
+    "noResults": "Meşru olaraq tur tapılmadı",
+    "sortBy": "Sıralama",
+    "featured": {
+      "title": "Seçilmiş",
+      "perPerson": "adam başına"
+    },
+    "priceLow": "Qiymət: Ucuzdan bahaya",
+    "priceHigh": "Qiymət: Bahadan ucuza",
+    "rating": "Reytinq"
+  },
+  "chat": {
+    "title": "Mesajlar",
+    "noMessages": "Hələ mesaj yoxdur",
+    "startConversation": "Söhbətə başlayın",
+    "typeMessage": "Mesaj yazın...",
+    "send": "Göndər",
+    "online": "Onlayn",
+    "offline": "Oflayn"
+  },
+  "dashboard": {
+    "welcome": "Xoş gəlmisiniz, {name}!",
+    "myTours": "Mənim turlarım",
+    "myBookings": "Mənim bronlarım",
+    "earnings": "Gəlir",
+    "settings": "Parametrlər",
+    "noTours": "Hələ tur yaratmamısınız",
+    "noBookings": "Hələ bron etməmisiniz",
+    "createFirst": "İlk turunuzu yaradın"
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Profilə düzəliş et",
+    "saveChanges": "Dəyişiklikləri saxla",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "email": "Elektron poçt",
+    "phone": "Telefon",
+    "bio": "Haqqında",
+    "memberSince": "Üzv olduğu tarix"
+  },
+  "errors": {
+    "notFound": "Səhifə tapılmadı",
+    "goHome": "Əsas səhifə",
+    "tryAgain": "Yenidən cəhd edin",
+    "serverError": "Server xətası. Zəhmət olmasa yenidən cəhd edin.",
+    "unauthorized": "Davam etmək üçün daxil olun",
+    "forbidden": "Bu səhifəyə girmək icazəniz yoxdur"
+  }
+}

@@ -1,0 +1,243 @@
+{
+  "common": {
+    "appName": "Nicat",
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "or": "or",
+    "and": "and"
+  },
+  "nav": {
+    "explore": "Explore",
+    "createTour": "Create Tour",
+    "chats": "Chats",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "searchPlaceholder": "Search tours, countries, cities...",
+    "searchPlaceholderMobile": "Search tours..."
+  },
+  "home": {
+    "hero": {
+      "badge": "🌍 Global Travel Platform",
+      "title": "Discover the world with <highlight>Nicat</highlight>",
+      "subtitle": "Find, create, and join group travel adventures around the world",
+      "searchPlaceholder": "Where do you want to go?",
+      "searchButton": "Find Tours",
+      "tours": "Tours",
+      "countries": "Countries",
+      "travelers": "Travelers"
+    },
+    "categories": {
+      "title": "Popular Categories",
+      "subtitle": "Choose the type of travel that interests you",
+      "adventure": "Adventure",
+      "cultural": "Cultural",
+      "nature": "Nature",
+      "beach": "Beach",
+      "foodWine": "Food & Wine",
+      "photography": "Photography"
+    },
+    "featured": {
+      "title": "Featured Tours",
+      "subtitle": "Top picks from verified hosts",
+      "viewAll": "All Tours",
+      "noTours": "Tours coming soon. Be the first!",
+      "perPerson": "/person"
+    },
+    "features": {
+      "title": "Why Choose Nicat?",
+      "subtitle": "We make travel accessible, safe, and enjoyable",
+      "globalTours": {
+        "title": "Global Tours",
+        "description": "Over 1000 tours in 50+ countries worldwide"
+      },
+      "groupTravel": {
+        "title": "Group Travel",
+        "description": "Find like-minded travelers for shared adventures"
+      },
+      "securePayments": {
+        "title": "Secure Payments",
+        "description": "Protected through Stripe Connect and data encryption"
+      },
+      "realtimeChat": {
+        "title": "Real-time Chat",
+        "description": "Connect with fellow travelers during your journey"
+      }
+    },
+    "cta": {
+      "title": "Ready for Adventures?",
+      "subtitle": "Join thousands of travelers from around the world",
+      "startJourney": "Start Your Journey",
+      "browseTours": "Browse Tours"
+    }
+  },
+  "footer": {
+    "about": "Global platform for discovering, creating, and joining group travel adventures. Find the perfect tour or create your own.",
+    "platform": "Platform",
+    "explore": "Explore",
+    "tours": "Tours",
+    "becomeHost": "Become a Host",
+    "contact": "Contact",
+    "copyright": "© {year} Nicat. All rights reserved."
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "signIn": "Sign In",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "orContinueWith": "Or continue with"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join our travel community",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "createAccount": "Create Account",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  },
+  "tours": {
+    "create": {
+      "title": "Create New Tour",
+      "basicInfo": "Basic Information",
+      "tourName": "Tour Name",
+      "tourNamePlaceholder": "e.g., Amazing Bali Adventure",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe your tour...",
+      "location": "Location",
+      "country": "Country",
+      "city": "City",
+      "pricing": "Pricing",
+      "basePrice": "Base Price",
+      "currency": "Currency",
+      "dates": "Dates",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "maxParticipants": "Max Participants",
+      "media": "Media",
+      "uploadPhotos": "Upload Photos",
+      "dragDrop": "Drag & drop photos here, or click to select",
+      "createTour": "Create Tour"
+    },
+    "detail": {
+      "bookNow": "Book Now",
+      "pricePerPerson": "Price per person",
+      "included": "Included",
+      "notIncluded": "Not Included",
+      "itinerary": "Itinerary",
+      "reviews": "Reviews",
+      "host": "Host",
+      "day": "Day"
+    }
+  },
+  "booking": {
+    "title": "Book Tour",
+    "passengers": "Passengers",
+    "addPassenger": "Add Passenger",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "passport": "Passport Number",
+    "payment": "Payment",
+    "total": "Total",
+    "confirmBooking": "Confirm Booking",
+    "confirmation": {
+      "title": "Booking Confirmed!",
+      "subtitle": "Your adventure awaits",
+      "tourDetails": "Tour Details",
+      "bookingId": "Booking ID",
+      "viewDashboard": "View Dashboard",
+      "backToHome": "Back to Home"
+    },
+    "tourDetails": "Tour Details"
+  },
+  "explore": {
+    "title": "Explore Tours",
+    "filters": {
+      "category": "Category",
+      "priceRange": "Price Range",
+      "duration": "Duration",
+      "rating": "Rating",
+      "clearFilters": "Clear Filters",
+      "daysUnit": "days",
+      "title": "Filters",
+      "countriesAndCities": "Countries & Cities",
+      "services": "Services",
+      "searchCountry": "Search country...",
+      "searchServices": "Search services...",
+      "citiesUnit": "cities",
+      "clearAllFilters": "Clear All Filters",
+      "noResults": "No results found"
+    },
+    "results": "tours found",
+    "noResults": "No tours found matching your criteria",
+    "sortBy": "Sort by",
+    "featured": {
+      "title": "Featured",
+      "perPerson": "/person"
+    },
+    "priceLow": "Price: Low to High",
+    "priceHigh": "Price: High to Low",
+    "rating": "Rating"
+  },
+  "chat": {
+    "title": "Messages",
+    "noMessages": "No messages yet",
+    "startConversation": "Start a conversation",
+    "typeMessage": "Type a message...",
+    "send": "Send",
+    "online": "Online",
+    "offline": "Offline"
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {name}!",
+    "myTours": "My Tours",
+    "myBookings": "My Bookings",
+    "earnings": "Earnings",
+    "settings": "Settings",
+    "noTours": "You haven't created any tours yet",
+    "noBookings": "You haven't made any bookings yet",
+    "createFirst": "Create Your First Tour"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "saveChanges": "Save Changes",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "bio": "Bio",
+    "memberSince": "Member since"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "goHome": "Go Home",
+    "tryAgain": "Try Again",
+    "serverError": "Server error. Please try again later.",
+    "unauthorized": "Please sign in to continue",
+    "forbidden": "You don't have permission to access this page"
+  }
+}
