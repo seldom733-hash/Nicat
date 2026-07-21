@@ -17,6 +17,36 @@ echo  Nicat Dev Server - Starting...
 echo ============================================
 echo.
 
+REM --- Start Redis ---
+netstat -ano | findstr ":6379 " | findstr "LISTENING" >nul 2>&1
+if %errorlevel% neq 0 (
+    where redis-server >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo [INFO] Starting Redis server...
+        start /b redis-server --loglevel warning >nul 2>&1
+        timeout /t 2 /nobreak >nul
+    ) else (
+        docker ps -a --format "{{.Names}}" | findstr "nicat-redis" >nul 2>&1
+        if %errorlevel% equ 0 (
+            echo [INFO] Starting Redis container...
+            docker start nicat-redis >nul 2>&1
+        ) else (
+            echo [INFO] Creating Redis container...
+            docker run -d --name nicat-redis -p 6379:6379 redis:7-alpine >nul 2>&1
+        )
+        timeout /t 2 /nobreak >nul
+    )
+    netstat -ano | findstr ":6379 " | findstr "LISTENING" >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo [SUCCESS] Redis started on port 6379
+    ) else (
+        echo [WARNING] Redis not available. Queues will not work.
+    )
+) else (
+    echo [INFO] Redis is already running on port 6379
+)
+echo.
+
 REM --- Start local PostgreSQL from project pgdata/ ---
 %PG_BIN%\pg_ctl.exe -D "%PGDATA%" status >nul 2>&1
 if %errorlevel% neq 0 (
@@ -98,7 +128,9 @@ echo   Backend:   http://localhost:%BACKEND_PORT%
 echo   API Docs:  http://localhost:%BACKEND_PORT%/api/docs
 echo   Health:    http://localhost:%BACKEND_PORT%/api/v1/health
 echo.
-echo   Logs:
+echo   Redis:     http://localhost:6379
+  echo.
+  echo   Logs:
 echo     Backend:  C:\temp\nicat-backend.log
 echo     Frontend: C:\temp\nicat-frontend.log
 echo.

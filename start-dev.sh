@@ -52,6 +52,43 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Check if Redis is running and start if needed
+start_redis() {
+    if is_port_in_use 6379; then
+        log_success "Redis is already running on port 6379"
+        return 0
+    fi
+
+    # Check if redis-server is available
+    if command -v redis-server &> /dev/null; then
+        log_info "Starting Redis server..."
+        redis-server --daemonize yes --loglevel warning 2>/dev/null
+        if is_port_in_use 6379; then
+            log_success "Redis started on port 6379"
+            return 0
+        fi
+    fi
+
+    # Try Docker
+    if command -v docker &> /dev/null; then
+        if docker ps -a --format '{{.Names}}' | grep -q nicat-redis; then
+            log_info "Starting existing Redis container..."
+            docker start nicat-redis > /dev/null 2>&1
+        else
+            log_info "Creating Redis container..."
+            docker run -d --name nicat-redis -p 6379:6379 redis:7-alpine > /dev/null 2>&1
+        fi
+        if is_port_in_use 6379; then
+            log_success "Redis started via Docker on port 6379"
+            return 0
+        fi
+    fi
+
+    log_warning "Redis not found. Install redis-server or Docker, or start Redis manually."
+    log_warning "Queues (email, payments, notifications) will not work without Redis."
+    return 0
+}
+
 # Check if a port is in use
 is_port_in_use() {
     local port=$1
@@ -157,6 +194,9 @@ show_status() {
 start_services() {
     log_info "Starting Nicat Dev Server..."
     echo ""
+    
+    # Start Redis
+    start_redis
     
     # Check if ports are already in use
     if is_port_in_use $BACKEND_PORT; then
