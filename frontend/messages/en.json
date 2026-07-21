@@ -304,7 +304,12 @@
       "noData": "No view data yet",
       "unique": "unique"
     },
-    "filterAllTours": "All Tours"
+    "filterAllTours": "All Tours",
+    "analytics.range.last7": "Last 7 days",
+    "analytics.range.last30": "Last 30 days",
+    "analytics.range.last90": "Last 90 days",
+    "analytics.range.thisYear": "This year",
+    "analytics.range.allTime": "All time"
   },
   "errors": {
     "notFound": "Page not found",

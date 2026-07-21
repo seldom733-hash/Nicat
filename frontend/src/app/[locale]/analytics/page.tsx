@@ -104,6 +104,15 @@ export default function AnalyticsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('day');
   const [days, setDays] = useState(30);
+  const [dateRange, setDateRange] = useState<string>('30');
+
+  const dateRanges = [
+    { value: '7', labelKey: 'analytics.range.last7' },
+    { value: '30', labelKey: 'analytics.range.last30' },
+    { value: '90', labelKey: 'analytics.range.last90' },
+    { value: '365', labelKey: 'analytics.range.thisYear' },
+    { value: '1825', labelKey: 'analytics.range.allTime' },
+  ];
 
   const fetchAnalytics = useCallback(async () => {
     try {
@@ -116,7 +125,7 @@ export default function AnalyticsPage() {
 
       const [funnelRes, revenueRes, tourRes, geoRes, srcRes, monthRes] = await Promise.all([
         fetch(`${API_BASE}/analytics/funnel`, { headers }).then((r) => r.json()),
-        fetch(`${API_BASE}/analytics/revenue?period=${period}&days=${days}`, { headers }).then((r) => r.json()),
+        fetch(`${API_BASE}/analytics/revenue?period=${period}&days=${dateRange}`, { headers }).then((r) => r.json()),
         fetch(`${API_BASE}/analytics/tours`, { headers }).then((r) => r.json()),
         fetch(`${API_BASE}/analytics/geography`, { headers }).then((r) => r.json()),
         fetch(`${API_BASE}/analytics/sources`, { headers }).then((r) => r.json()),
@@ -137,7 +146,7 @@ export default function AnalyticsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [period, days]);
+  }, [period, dateRange]);
 
   useEffect(() => {
     if (authLoading || !isAuthenticated) return;
@@ -167,17 +176,35 @@ export default function AnalyticsPage() {
             <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
             <p className="text-gray-500 mt-1">{t('subtitle')}</p>
           </div>
-          <div className="flex items-center gap-2">
-            {(['day', 'week', 'month'] as const).map((p) => (
-              <Button
-                key={p}
-                variant={period === p ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setPeriod(p)}
-              >
-                {t(`period.${p}`)}
-              </Button>
-            ))}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Date Range Filter */}
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              className="px-3 py-1.5 rounded-lg border border-gray-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent-500"
+            >
+              {dateRanges.map((dr) => (
+                <option key={dr.value} value={dr.value}>
+                  {t(dr.labelKey)}
+                </option>
+              ))}
+            </select>
+            {/* Chart Grouping */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+              {(['day', 'week', 'month'] as const).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPeriod(p)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                    period === p
+                      ? 'bg-white text-primary-700 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {t(`period.${p}`)}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

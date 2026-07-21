@@ -304,7 +304,12 @@
       "noData": "Данных о просмотрах пока нет",
       "unique": "уник."
     },
-    "filterAllTours": "Все туры"
+    "filterAllTours": "Все туры",
+    "analytics.range.last7": "Последние 7 дней",
+    "analytics.range.last30": "Последние 30 дней",
+    "analytics.range.last90": "Последние 90 дней",
+    "analytics.range.thisYear": "Этот год",
+    "analytics.range.allTime": "Всё время"
   },
   "errors": {
     "notFound": "Страница не найдена",
