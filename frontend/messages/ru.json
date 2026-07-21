@@ -24,6 +24,7 @@
     "profile": "Профиль",
     "dashboard": "Панель",
     "myTours": "Мои туры",
+    "analytics": "Аналитика",
     "signIn": "Войти",
     "signUp": "Регистрация",
     "signOut": "Выйти",
@@ -253,6 +254,37 @@
     "createTour": "Создать тур",
     "edit": "Редактировать",
     "confirmDelete": "Вы уверены, что хотите удалить этот тур?"
+  },
+  "analytics": {
+    "title": "Аналитика и воронка продаж",
+    "subtitle": "Отслеживайте эффективность, конверсии и выручку",
+    "period": { "day": "Дни", "week": "Недели", "month": "Месяцы" },
+    "summary": { "revenue": "Выручка за месяц", "bookings": "Бронирования за месяц", "passengers": "Пассажиры", "vsLastMonth": "к прошлому месяцу", "thisMonth": "В этом месяце" },
+    "funnel": {
+      "title": "Воронка продаж",
+      "views": "Всего просмотров",
+      "uniqueVisitors": "Уникальные посетители",
+      "bookingsStarted": "Начато бронирований",
+      "bookingsPaid": "Оплачено",
+      "bookingsCompleted": "Завершено туров",
+      "bookingsCancelled": "Отменено",
+      "viewToBooking": "Просмотр → Бронь",
+      "bookingToPaid": "Бронь → Оплата",
+      "paidToCompleted": "Оплата → Завершение",
+      "overall": "Общая конверсия"
+    },
+    "revenue": { "title": "Выручка по времени" },
+    "tours": {
+      "title": "Эффективность туров",
+      "name": "Тур",
+      "views": "Просмотры",
+      "bookings": "Бронирования",
+      "revenue": "Выручка",
+      "conversion": "Конв.",
+      "rating": "Рейтинг"
+    },
+    "geography": { "title": "География", "noData": "Данных о бронированиях пока нет" },
+    "sources": { "title": "Источники трафика", "noData": "Данных о просмотрах пока нет", "unique": "уник." }
   },
   "errors": {
     "notFound": "Страница не найдена",

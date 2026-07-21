@@ -24,6 +24,7 @@
     "profile": "Profile",
     "dashboard": "Dashboard",
     "myTours": "My Tours",
+    "analytics": "Analytics",
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "signOut": "Sign Out",
@@ -253,6 +254,37 @@
     "createTour": "Create Tour",
     "edit": "Edit",
     "confirmDelete": "Are you sure you want to delete this tour?"
+  },
+  "analytics": {
+    "title": "Analytics & Sales Funnel",
+    "subtitle": "Track your performance, conversions, and revenue",
+    "period": { "day": "Days", "week": "Weeks", "month": "Months" },
+    "summary": { "revenue": "Monthly Revenue", "bookings": "Monthly Bookings", "passengers": "Passengers", "vsLastMonth": "vs last month", "thisMonth": "This month" },
+    "funnel": {
+      "title": "Sales Funnel",
+      "views": "Total Views",
+      "uniqueVisitors": "Unique Visitors",
+      "bookingsStarted": "Bookings Started",
+      "bookingsPaid": "Paid Bookings",
+      "bookingsCompleted": "Completed Tours",
+      "bookingsCancelled": "Cancelled",
+      "viewToBooking": "View → Booking",
+      "bookingToPaid": "Booking → Paid",
+      "paidToCompleted": "Paid → Completed",
+      "overall": "Overall Conversion"
+    },
+    "revenue": { "title": "Revenue Over Time" },
+    "tours": {
+      "title": "Tour Performance",
+      "name": "Tour",
+      "views": "Views",
+      "bookings": "Bookings",
+      "revenue": "Revenue",
+      "conversion": "Conv.",
+      "rating": "Rating"
+    },
+    "geography": { "title": "Geography", "noData": "No booking data yet" },
+    "sources": { "title": "Traffic Sources", "noData": "No view data yet", "unique": "unique" }
   },
   "errors": {
     "notFound": "Page not found",

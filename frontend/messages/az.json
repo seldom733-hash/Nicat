@@ -24,6 +24,7 @@
     "profile": "Profil",
     "dashboard": "İdarə paneli",
     "myTours": "Mənim turlarım",
+    "analytics": "Analitika",
     "signIn": "Daxil ol",
     "signUp": "Qeydiyyat",
     "signOut": "Çıxış",
@@ -253,6 +254,37 @@
     "createTour": "Tur yaradın",
     "edit": "Redaktə et",
     "confirmDelete": "Bu turu silmək istədiyinizə əminsiniz?"
+  },
+  "analytics": {
+    "title": "Analitika və Satış Funeli",
+    "subtitle": "Performans, konversiya və gəliri izləyin",
+    "period": { "day": "Gün", "week": "Həftə", "month": "Ay" },
+    "summary": { "revenue": "Aylıq Gəlir", "bookings": "Aylıq Bronlamalar", "passengers": "Sərnişinlər", "vsLastMonth": "keçən aya nisbətən", "thisMonth": "Bu ay" },
+    "funnel": {
+      "title": "Satış Funeli",
+      "views": "Ümumi Baxışlar",
+      "uniqueVisitors": "Unikal Ziyarətçilər",
+      "bookingsStarted": "Başlanan Bronlamalar",
+      "bookingsPaid": "Ödənilmiş Bronlamalar",
+      "bookingsCompleted": "Tamamlanmış Turlar",
+      "bookingsCancelled": "Ləğv Edilmiş",
+      "viewToBooking": "Baxış → Bron",
+      "bookingToPaid": "Bron → Ödəniş",
+      "paidToCompleted": "Ödəniş → Tamamlama",
+      "overall": "Ümumi Konversiya"
+    },
+    "revenue": { "title": "Gəlir Dinamikası" },
+    "tours": {
+      "title": "Tur Performansı",
+      "name": "Tur",
+      "views": "Baxışlar",
+      "bookings": "Bronlamalar",
+      "revenue": "Gəlir",
+      "conversion": "Konv.",
+      "rating": "Reytinq"
+    },
+    "geography": { "title": "Coğrafiya", "noData": "Hələ bronlama məlumatı yoxdur" },
+    "sources": { "title": "Trafik Mənbələri", "noData": "Hələ baxış məlumatı yoxdur", "unique": "unikal" }
   },
   "errors": {
     "notFound": "Səhifə tapılmadı",
