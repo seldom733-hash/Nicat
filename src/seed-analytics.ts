@@ -114,11 +114,11 @@ async function seed() {
         const user = Math.random() > 0.3 ? randomChoice(testUsers) : null;
         const view = viewRepo.create({
           tourId: tour.id,
-          userId: user?.id || null,
+          userId: user?.id || undefined,
           source: randomChoice(sources),
           deviceType: randomChoice(devices),
           country: randomChoice(countries),
-          referrerUrl: Math.random() > 0.5 ? `https://${randomChoice(['google.com', 'instagram.com', 'facebook.com', 'tripadvisor.com'])}` : null,
+          referrerUrl: Math.random() > 0.5 ? `https://${randomChoice(['google.com', 'instagram.com', 'facebook.com', 'tripadvisor.com'])}` : undefined,
           sessionDuration: randomInt(5, 300),
           viewedAt: viewDate,
         });
