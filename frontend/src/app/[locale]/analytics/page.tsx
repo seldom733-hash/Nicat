@@ -149,8 +149,8 @@ export default function AnalyticsPage() {
     );
   }
 
-  const fmt = (n: number) => n.toLocaleString();
-  const fmtCurrency = (n: number) => `$${n.toLocaleString()}`;
+  const fmt = (n: number) => (n || 0).toLocaleString();
+  const fmtCurrency = (n: number) => `$${(n || 0).toLocaleString()}`;
   const fmtPercent = (v: string) => `${v}%`;
 
   const maxRevenue = revenue.length > 0 ? Math.max(...revenue.map((r) => parseFloat(r.grossrevenue || '0')), 1) : 1;
@@ -179,7 +179,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Monthly Summary Cards */}
-        {monthly && (
+        {monthly?.currentMonth && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <Card>
               <CardContent className="p-5">
