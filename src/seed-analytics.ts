@@ -8,6 +8,8 @@ import { Booking } from './modules/bookings/entities/booking.entity';
 import { Passenger } from './modules/bookings/entities/passenger.entity';
 import { Payment } from './modules/payments/entities/payment.entity';
 import { TourView } from './modules/dashboard/entities/tour-view.entity';
+import { ItineraryItem } from './modules/tours/entities/itinerary-item.entity';
+import { TourMedia } from './modules/tours/entities/tour-media.entity';
 import { BookingStatus, PaymentStatus, TourStatus } from './common/constants';
 
 config({ path: path.join(__dirname, '..', '.env') });
@@ -19,8 +21,8 @@ const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_DATABASE || 'nicat',
-  synchronize: false,
-  entities: [Tour, User, Booking, Passenger, Payment, TourView],
+  synchronize: true,
+  entities: [Tour, User, Booking, Passenger, Payment, TourView, ItineraryItem, TourMedia],
 });
 
 const sources = ['search', 'direct', 'chat', 'social', 'email', 'referral'];
@@ -67,7 +69,7 @@ async function seed() {
     const paymentRepo = AppDataSource.getRepository(Payment);
     const viewRepo = AppDataSource.getRepository(TourView);
 
-    const host = await userRepo.findOne({ where: { email: 'seldom733@gmail.com' } });
+    const host = await userRepo.findOne({ where: { email: 'admin@nicat.com' } });
     if (!host) {
       console.log('Host user not found. Please register first.');
       await AppDataSource.destroy();
