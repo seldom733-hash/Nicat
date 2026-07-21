@@ -1,92 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Tour } from '../tours/entities/tour.entity';
-import { Booking } from '../bookings/entities/booking.entity';
-import { Payment } from '../payments/entities/payment.entity';
-import { TourView } from './entities/tour-view.entity';
-import { TourStatus, BookingStatus, PaymentStatus } from '../../common/constants';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AnalyticsService {
   constructor(
-    @InjectRepository(Tour)
-    private readonly tourRepo: Repository<Tour>,
-    @InjectRepository(Booking)
-    private readonly bookingRepo: Repository<Booking>,
-    @InjectRepository(Payment)
-    private readonly paymentRepo: Repository<Payment>,
-    @InjectRepository(TourView)
-    private readonly viewRepo: Repository<TourView>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   /**
    * Sales funnel: views → bookings started → paid → confirmed → completed
    */
   async getFunnel(hostId: string, tourId?: string) {
-    const tourFilter = tourId
-      ? 'AND t.id = :tourId'
-      : '';
-    const params: Record<string, any> = { hostId };
-    if (tourId) params.tourId = tourId;
+    const tourFilter = tourId ? 'AND t.id = $2' : '';
+    const extraParam = tourId ? [hostId, tourId] : [hostId];
 
     // 1. Total views
-    const viewsQuery = this.viewRepo
-      .createQueryBuilder('v')
-      .innerJoin('v.tour', 't')
-      .where(`t.hostId = :hostId ${tourFilter}`, params);
-
-    const totalViews = await viewsQuery.getCount();
+    const viewsResult = await this.dataSource.query(`
+      SELECT COUNT(*)::int AS total
+      FROM tour_views v
+      INNER JOIN tours t ON v."tourId" = t.id
+      WHERE t."hostId" = $1 ${tourFilter}
+    `, extraParam);
+    const totalViews = viewsResult[0]?.total ?? 0;
 
     // 2. Unique visitors
-    const uniqueVisitors = await this.viewRepo
-      .createQueryBuilder('v')
-      .innerJoin('v.tour', 't')
-      .where(`t.hostId = :hostId ${tourFilter}`, params)
-      .select('COUNT(DISTINCT COALESCE(v.userId, v.id))')
-      .getRawOne();
+    const uniqueResult = await this.dataSource.query(`
+      SELECT COUNT(DISTINCT COALESCE(v."userId"::text, v.id::text))::int AS total
+      FROM tour_views v
+      INNER JOIN tours t ON v."tourId" = t.id
+      WHERE t."hostId" = $1 ${tourFilter}
+    `, extraParam);
+    const uniqueVisitors = uniqueResult[0]?.total ?? 0;
 
-    // 3. Bookings started (all bookings)
-    const bookingsStarted = await this.bookingRepo
-      .createQueryBuilder('b')
-      .innerJoin('b.tour', 't')
-      .where(`t.hostId = :hostId ${tourFilter}`, params)
-      .getCount();
+    // 3-6. Bookings counts
+    const baseWhere = `b."tourId" IN (SELECT id FROM tours WHERE "hostId" = $1${tourId ? ' AND id = $2' : ''})`;
 
-    // 4. Paid bookings
-    const bookingsPaid = await this.bookingRepo
-      .createQueryBuilder('b')
-      .innerJoin('b.tour', 't')
-      .where(`t.hostId = :hostId ${tourFilter}`, params)
-      .andWhere('b.status IN (:...statuses)', {
-        statuses: [BookingStatus.CONFIRMED, BookingStatus.PAID, BookingStatus.COMPLETED],
-      })
-      .getCount();
+    const bookingsStarted = await this.bookingCount(extraParam, baseWhere, '');
+    const bookingsPaid = await this.bookingCount(extraParam, baseWhere, `AND b.status IN ('confirmed','paid','completed')`);
+    const bookingsCompleted = await this.bookingCount(extraParam, baseWhere, `AND b.status = 'completed'`);
+    const bookingsCancelled = await this.bookingCount(extraParam, baseWhere, `AND b.status = 'cancelled'`);
 
-    // 5. Completed bookings
-    const bookingsCompleted = await this.bookingRepo
-      .createQueryBuilder('b')
-      .innerJoin('b.tour', 't')
-      .where(`t.hostId = :hostId ${tourFilter}`, params)
-      .andWhere('b.status = :status', { status: BookingStatus.COMPLETED })
-      .getCount();
-
-    // 6. Cancelled bookings
-    const bookingsCancelled = await this.bookingRepo
-      .createQueryBuilder('b')
-      .innerJoin('b.tour', 't')
-      .where(`t.hostId = :hostId ${tourFilter}`, params)
-      .andWhere('b.status = :status', { status: BookingStatus.CANCELLED })
-      .getCount();
-
-    const totalBookings = bookingsStarted;
     const conversionRate = totalViews > 0 ? ((bookingsPaid / totalViews) * 100).toFixed(2) : '0';
 
     return {
       funnel: {
         views: totalViews,
-        uniqueVisitors: parseInt(uniqueVisitors?.count || '0'),
-        bookingsStarted: totalBookings,
+        uniqueVisitors,
+        bookingsStarted,
         bookingsPaid,
         bookingsCompleted,
         bookingsCancelled,
@@ -100,6 +62,15 @@ export class AnalyticsService {
     };
   }
 
+  private async bookingCount(params: any[], baseWhere: string, extraWhere: string): Promise<number> {
+    const result = await this.dataSource.query(`
+      SELECT COUNT(*)::int AS total
+      FROM bookings b
+      WHERE ${baseWhere} ${extraWhere}
+    `, params);
+    return result[0]?.total ?? 0;
+  }
+
   /**
    * Revenue analytics over time
    */
@@ -107,23 +78,24 @@ export class AnalyticsService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const dateFormat = period === 'month' ? 'YYYY-MM' : period === 'week' ? 'YYYY-WW' : 'YYYY-MM-DD';
+    const dateFormat = period === 'month' ? 'YYYY-MM' : period === 'week' ? 'IYYY-IW' : 'YYYY-MM-DD';
 
-    const data = await this.paymentRepo
-      .createQueryBuilder('p')
-      .innerJoin('p.booking', 'b')
-      .innerJoin('b.tour', 't')
-      .select(`TO_CHAR(p.createdAt, '${dateFormat}')`, 'date')
-      .addSelect('SUM(p.amount)', 'grossRevenue')
-      .addSelect('SUM(p.amount * (1 - b.commissionRate / 100))', 'netRevenue')
-      .addSelect('SUM(b.commissionAmount)', 'commission')
-      .addSelect('COUNT(p.id)', 'transactions')
-      .where('t.hostId = :hostId', { hostId })
-      .andWhere('p.status = :status', { status: PaymentStatus.SUCCEEDED })
-      .andWhere('p.createdAt >= :startDate', { startDate })
-      .groupBy(`TO_CHAR(p.createdAt, '${dateFormat}')`)
-      .orderBy('date', 'ASC')
-      .getRawMany();
+    const data = await this.dataSource.query(`
+      SELECT
+        TO_CHAR(p."createdAt", '${dateFormat}') AS "date",
+        SUM(p.amount)::numeric AS "grossRevenue",
+        SUM(p.amount * (1 - b."commissionRate" / 100))::numeric AS "netRevenue",
+        SUM(b."commissionAmount")::numeric AS "commission",
+        COUNT(p.id)::int AS "transactions"
+      FROM payments p
+      INNER JOIN bookings b ON p."bookingId" = b.id
+      INNER JOIN tours t ON b."tourId" = t.id
+      WHERE t."hostId" = $1
+        AND p.status = 'succeeded'
+        AND p."createdAt" >= $2
+      GROUP BY TO_CHAR(p."createdAt", '${dateFormat}')
+      ORDER BY "date" ASC
+    `, [hostId, startDate.toISOString()]);
 
     return data;
   }
@@ -132,45 +104,49 @@ export class AnalyticsService {
    * Tour performance stats
    */
   async getTourPerformance(hostId: string) {
-    const tours = await this.tourRepo.find({
-      where: { hostId },
-      order: { bookingCount: 'DESC' },
-    });
+    const tours = await this.dataSource.query(`
+      SELECT
+        t.id, t.title, t.status, t.category, t."basePrice",
+        t."averageRating", t."reviewCount"
+      FROM tours t
+      WHERE t."hostId" = $1
+      ORDER BY t."bookingCount" DESC
+    `, [hostId]);
 
-    const tourIds = tours.map((t) => t.id);
-    if (tourIds.length === 0) return [];
+    if (tours.length === 0) return [];
 
-    // Get views per tour
-    const viewsPerTour = await this.viewRepo
-      .createQueryBuilder('v')
-      .select('v.tourId', 'tourId')
-      .addSelect('COUNT(*)', 'views')
-      .addSelect('COUNT(DISTINCT COALESCE(v.userId, v.id))', 'uniqueVisitors')
-      .where('v.tourId IN (:...tourIds)', { tourIds })
-      .groupBy('v.tourId')
-      .getRawMany();
+    const tourIds = tours.map((_: any, i: number) => `$${i + 1}`);
+    const tourIdParams = tours.map((t: any) => t.id);
 
-    const viewsMap = new Map(viewsPerTour.map((v) => [v.tourId, { views: parseInt(v.views), uniqueVisitors: parseInt(v.uniqueVisitors) }]));
+    const viewsPerTour = await this.dataSource.query(`
+      SELECT
+        v."tourId",
+        COUNT(*)::int AS views,
+        COUNT(DISTINCT COALESCE(v."userId"::text, v.id::text))::int AS "uniqueVisitors"
+      FROM tour_views v
+      WHERE v."tourId" IN (${tourIds.join(',')})
+      GROUP BY v."tourId"
+    `, tourIdParams);
 
-    // Get bookings per tour
-    const bookingsPerTour = await this.bookingRepo
-      .createQueryBuilder('b')
-      .select('b.tourId', 'tourId')
-      .addSelect('COUNT(*)', 'totalBookings')
-      .addSelect('SUM(CASE WHEN b.status IN (:...paid) THEN 1 ELSE 0 END)', 'paidBookings')
-      .addSelect('SUM(b.totalBasePrice)', 'revenue')
-      .where('b.tourId IN (:...tourIds)', { tourIds })
-      .setParameter('paid', [BookingStatus.CONFIRMED, BookingStatus.PAID, BookingStatus.COMPLETED])
-      .groupBy('b.tourId')
-      .getRawMany();
+    const bookingsPerTour = await this.dataSource.query(`
+      SELECT
+        b."tourId",
+        COUNT(*)::int AS "totalBookings",
+        SUM(CASE WHEN b.status IN ('confirmed','paid','completed') THEN 1 ELSE 0 END)::int AS "paidBookings",
+        SUM(b."totalBasePrice")::numeric AS revenue
+      FROM bookings b
+      WHERE b."tourId" IN (${tourIds.join(',')})
+      GROUP BY b."tourId"
+    `, tourIdParams);
 
-    const bookingsMap = new Map(bookingsPerTour.map((b) => [b.tourId, {
-      totalBookings: parseInt(b.totalBookings),
-      paidBookings: parseInt(b.paidBookings || '0'),
+    const viewsMap = new Map<string, { views: number; uniqueVisitors: number }>(viewsPerTour.map((v: any) => [v.tourId, { views: v.views, uniqueVisitors: v.uniqueVisitors }]));
+    const bookingsMap = new Map<string, { totalBookings: number; paidBookings: number; revenue: number }>(bookingsPerTour.map((b: any) => [b.tourId, {
+      totalBookings: b.totalBookings,
+      paidBookings: b.paidBookings || 0,
       revenue: parseFloat(b.revenue || '0'),
     }]));
 
-    return tours.map((tour) => {
+    return tours.map((tour: any) => {
       const views = viewsMap.get(tour.id) || { views: 0, uniqueVisitors: 0 };
       const bookings = bookingsMap.get(tour.id) || { totalBookings: 0, paidBookings: 0, revenue: 0 };
       const conversionRate = views.views > 0 ? ((bookings.paidBookings / views.views) * 100).toFixed(2) : '0';
@@ -197,20 +173,19 @@ export class AnalyticsService {
    * Geography breakdown — where bookings come from
    */
   async getGeography(hostId: string) {
-    const data = await this.bookingRepo
-      .createQueryBuilder('b')
-      .innerJoin('b.tour', 't')
-      .select('t.country', 'tourCountry')
-      .addSelect('COUNT(b.id)', 'bookings')
-      .addSelect('SUM(b.totalBasePrice)', 'revenue')
-      .addSelect('COUNT(DISTINCT b.userId)', 'uniqueUsers')
-      .where('t.hostId = :hostId', { hostId })
-      .andWhere('b.status IN (:...statuses)', {
-        statuses: [BookingStatus.CONFIRMED, BookingStatus.PAID, BookingStatus.COMPLETED],
-      })
-      .groupBy('t.country')
-      .orderBy('bookings', 'DESC')
-      .getRawMany();
+    const data = await this.dataSource.query(`
+      SELECT
+        t.country AS "tourCountry",
+        COUNT(b.id)::int AS bookings,
+        SUM(b."totalBasePrice")::numeric AS revenue,
+        COUNT(DISTINCT b."userId")::int AS "uniqueUsers"
+      FROM bookings b
+      INNER JOIN tours t ON b."tourId" = t.id
+      WHERE t."hostId" = $1
+        AND b.status IN ('confirmed','paid','completed')
+      GROUP BY t.country
+      ORDER BY bookings DESC
+    `, [hostId]);
 
     return data;
   }
@@ -219,16 +194,17 @@ export class AnalyticsService {
    * Source breakdown — how visitors find tours
    */
   async getSources(hostId: string) {
-    const data = await this.viewRepo
-      .createQueryBuilder('v')
-      .innerJoin('v.tour', 't')
-      .select('v.source', 'source')
-      .addSelect('COUNT(*)', 'views')
-      .addSelect('COUNT(DISTINCT COALESCE(v.userId, v.id))', 'uniqueVisitors')
-      .where('t.hostId = :hostId', { hostId })
-      .groupBy('v.source')
-      .orderBy('views', 'DESC')
-      .getRawMany();
+    const data = await this.dataSource.query(`
+      SELECT
+        v.source,
+        COUNT(*)::int AS views,
+        COUNT(DISTINCT COALESCE(v."userId"::text, v.id::text))::int AS "uniqueVisitors"
+      FROM tour_views v
+      INNER JOIN tours t ON v."tourId" = t.id
+      WHERE t."hostId" = $1
+      GROUP BY v.source
+      ORDER BY views DESC
+    `, [hostId]);
 
     return data;
   }
@@ -266,20 +242,24 @@ export class AnalyticsService {
   }
 
   private async getMonthData(hostId: string, start: Date, end: Date) {
-    const bookings = await this.bookingRepo
-      .createQueryBuilder('b')
-      .innerJoin('b.tour', 't')
-      .where('t.hostId = :hostId', { hostId })
-      .andWhere('b.status IN (:...statuses)', {
-        statuses: [BookingStatus.CONFIRMED, BookingStatus.PAID, BookingStatus.COMPLETED],
-      })
-      .andWhere('b.createdAt BETWEEN :start AND :end', { start, end })
-      .getMany();
+    const result = await this.dataSource.query(`
+      SELECT
+        COUNT(*)::int AS bookings,
+        COALESCE(SUM(b."totalBasePrice"), 0)::numeric AS revenue,
+        COALESCE(SUM(b."numberOfPassengers"), 0)::int AS passengers
+      FROM bookings b
+      INNER JOIN tours t ON b."tourId" = t.id
+      WHERE t."hostId" = $1
+        AND b.status IN ('confirmed','paid','completed')
+        AND b."createdAt" >= $2
+        AND b."createdAt" <= $3
+    `, [hostId, start.toISOString(), end.toISOString()]);
 
+    const row = result[0] || { bookings: 0, revenue: 0, passengers: 0 };
     return {
-      bookings: bookings.length,
-      revenue: bookings.reduce((sum, b) => sum + Number(b.totalBasePrice), 0),
-      passengers: bookings.reduce((sum, b) => sum + b.numberOfPassengers, 0),
+      bookings: row.bookings,
+      revenue: parseFloat(row.revenue || '0'),
+      passengers: row.passengers,
     };
   }
 }
