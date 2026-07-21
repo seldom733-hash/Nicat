@@ -200,7 +200,6 @@ export class AnalyticsService {
     const data = await this.bookingRepo
       .createQueryBuilder('b')
       .innerJoin('b.tour', 't')
-      .innerJoin('b.user', 'u')
       .select('t.country', 'tourCountry')
       .addSelect('COUNT(b.id)', 'bookings')
       .addSelect('SUM(b.totalBasePrice)', 'revenue')
