@@ -111,7 +111,6 @@ export default function AnalyticsPage() {
   const [monthly, setMonthly] = useState<MonthlyData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('day');
-  const [days, setDays] = useState(30);
   const [dateRange, setDateRange] = useState<string>('30');
 
   const fetchAnalytics = useCallback(async () => {
