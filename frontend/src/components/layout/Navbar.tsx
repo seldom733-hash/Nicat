@@ -16,6 +16,7 @@ import {
   MessageCircle,
   ChevronDown,
   Globe,
+  Briefcase,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/lib/store';
@@ -177,6 +178,14 @@ export default function Navbar() {
                       >
                         <LayoutDashboard className="mr-2 h-4 w-4" />
                         {t('dashboard')}
+                      </Link>
+                      <Link
+                        href={`/${locale}/my-tours`}
+                        onClick={() => setIsProfileOpen(false)}
+                        className="flex items-center px-4 py-2 text-sm text-ink-900/80 hover:bg-primary-950/5"
+                      >
+                        <Briefcase className="mr-2 h-4 w-4" />
+                        {t('myTours')}
                       </Link>
                       <Link
                         href={`/${locale}/chat`}

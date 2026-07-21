@@ -23,6 +23,7 @@
     "chats": "Chats",
     "profile": "Profile",
     "dashboard": "Dashboard",
+    "myTours": "My Tours",
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "signOut": "Sign Out",
@@ -244,6 +245,14 @@
     "phone": "Phone",
     "bio": "Bio",
     "memberSince": "Member since"
+  },
+  "myTours": {
+    "title": "My Tours",
+    "noTours": "You haven't created any tours yet",
+    "createFirst": "Create Your First Tour",
+    "createTour": "Create Tour",
+    "edit": "Edit",
+    "confirmDelete": "Are you sure you want to delete this tour?"
   },
   "errors": {
     "notFound": "Page not found",

@@ -23,6 +23,7 @@
     "chats": "Söhbətlər",
     "profile": "Profil",
     "dashboard": "İdarə paneli",
+    "myTours": "Mənim turlarım",
     "signIn": "Daxil ol",
     "signUp": "Qeydiyyat",
     "signOut": "Çıxış",
@@ -244,6 +245,14 @@
     "phone": "Telefon",
     "bio": "Haqqında",
     "memberSince": "Üzv olduğu tarix"
+  },
+  "myTours": {
+    "title": "Mənim turlarım",
+    "noTours": "Siz hələ heç bir tur yaratmamısınız",
+    "createFirst": "İlk turunuzu yaradın",
+    "createTour": "Tur yaradın",
+    "edit": "Redaktə et",
+    "confirmDelete": "Bu turu silmək istədiyinizə əminsiniz?"
   },
   "errors": {
     "notFound": "Səhifə tapılmadı",
