@@ -46,8 +46,8 @@ interface FunnelData {
 
 interface RevenuePoint {
   date: string;
-  grossrevenue: string;
-  netrevenue: string;
+  grossRevenue: string;
+  netRevenue: string;
   commission: string;
   transactions: string;
 }
@@ -69,16 +69,16 @@ interface TourPerf {
 }
 
 interface GeoPoint {
-  tourcountry: string;
+  tourCountry: string;
   bookings: string;
   revenue: string;
-  uniqueusers: string;
+  uniqueUsers: string;
 }
 
 interface SourcePoint {
   source: string;
   views: string;
-  uniquevisitors: string;
+  uniqueVisitors: string;
 }
 
 interface MonthlyData {
@@ -123,12 +123,15 @@ export default function AnalyticsPage() {
         fetch(`${API_BASE}/analytics/monthly`, { headers }).then((r) => r.json()),
       ]);
 
-      setFunnel(funnelRes);
-      setRevenue(Array.isArray(revenueRes) ? revenueRes : []);
-      setTourPerf(Array.isArray(tourRes) ? tourRes : []);
-      setGeography(Array.isArray(geoRes) ? geoRes : []);
-      setSources(Array.isArray(srcRes) ? srcRes : []);
-      setMonthly(monthRes);
+      // Extract .data from TransformInterceptor wrapper { data, timestamp, path }
+      const extract = (r: any) => r?.data ?? r;
+      const funnelData = extract(funnelRes);
+      setFunnel(funnelData?.funnel ? funnelData : null);
+      setRevenue(Array.isArray(extract(revenueRes)) ? extract(revenueRes) : []);
+      setTourPerf(Array.isArray(extract(tourRes)) ? extract(tourRes) : []);
+      setGeography(Array.isArray(extract(geoRes)) ? extract(geoRes) : []);
+      setSources(Array.isArray(extract(srcRes)) ? extract(srcRes) : []);
+      setMonthly(extract(monthRes));
     } catch (err) {
       console.error('Failed to load analytics:', err);
     } finally {
@@ -153,7 +156,7 @@ export default function AnalyticsPage() {
   const fmtCurrency = (n: number) => `$${(n || 0).toLocaleString()}`;
   const fmtPercent = (v: string) => `${v}%`;
 
-  const maxRevenue = revenue.length > 0 ? Math.max(...revenue.map((r) => parseFloat(r.grossrevenue || '0')), 1) : 1;
+  const maxRevenue = revenue.length > 0 ? Math.max(...revenue.map((r) => parseFloat(r.grossRevenue || '0')), 1) : 1;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -296,8 +299,7 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-end gap-1 h-48">
-                {revenue.map((point, i) => {
-                  const height = (parseFloat(point.grossrevenue || '0') / maxRevenue) * 100;
+                {revenue.map((point, i) => {                      const height = (parseFloat(point.grossRevenue || '0') / maxRevenue) * 100;
                   return (
                     <div key={i} className="flex-1 flex flex-col items-center gap-1" title={point.date}>
                       <div
@@ -396,7 +398,7 @@ export default function AnalyticsPage() {
                     const width = (parseInt(geo.bookings) / maxBookings) * 100;
                     return (
                       <div key={i} className="flex items-center gap-3">
-                        <span className="text-sm text-gray-700 w-28 truncate font-medium">{geo.tourcountry}</span>
+                        <span className="text-sm text-gray-700 w-28 truncate font-medium">{geo.tourCountry}</span>
                         <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
                           <div
                             className="bg-blue-500 h-full rounded-full flex items-center justify-end pr-2"
@@ -442,7 +444,7 @@ export default function AnalyticsPage() {
                             <span className="text-white text-xs font-medium">{src.views}</span>
                           </div>
                         </div>
-                        <span className="text-xs text-gray-400 w-16 text-right">{src.uniquevisitors} {t('sources.unique')}</span>
+                        <span className="text-xs text-gray-400 w-16 text-right">{src.uniqueVisitors} {t('sources.unique')}</span>
                       </div>
                     );
                   })}
