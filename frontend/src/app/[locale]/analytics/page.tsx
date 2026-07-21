@@ -89,6 +89,14 @@ interface MonthlyData {
 
 const API_BASE = '/api/v1';
 
+const DATE_RANGES = [
+  { value: '7', labelKey: 'analytics.range.last7' },
+  { value: '30', labelKey: 'analytics.range.last30' },
+  { value: '90', labelKey: 'analytics.range.last90' },
+  { value: '365', labelKey: 'analytics.range.thisYear' },
+  { value: '1825', labelKey: 'analytics.range.allTime' },
+];
+
 export default function AnalyticsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   const t = useTranslations('analytics');
@@ -105,14 +113,6 @@ export default function AnalyticsPage() {
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('day');
   const [days, setDays] = useState(30);
   const [dateRange, setDateRange] = useState<string>('30');
-
-  const dateRanges = [
-    { value: '7', labelKey: 'analytics.range.last7' },
-    { value: '30', labelKey: 'analytics.range.last30' },
-    { value: '90', labelKey: 'analytics.range.last90' },
-    { value: '365', labelKey: 'analytics.range.thisYear' },
-    { value: '1825', labelKey: 'analytics.range.allTime' },
-  ];
 
   const fetchAnalytics = useCallback(async () => {
     try {
@@ -183,7 +183,7 @@ export default function AnalyticsPage() {
               onChange={(e) => setDateRange(e.target.value)}
               className="px-3 py-1.5 rounded-lg border border-gray-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent-500"
             >
-              {dateRanges.map((dr) => (
+              {DATE_RANGES.map((dr) => (
                 <option key={dr.value} value={dr.value}>
                   {t(dr.labelKey)}
                 </option>
