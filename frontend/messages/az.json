@@ -258,8 +258,18 @@
   "analytics": {
     "title": "Analitika və Satış Funeli",
     "subtitle": "Performans, konversiya və gəliri izləyin",
-    "period": { "day": "Gün", "week": "Həftə", "month": "Ay" },
-    "summary": { "revenue": "Aylıq Gəlir", "bookings": "Aylıq Bronlamalar", "passengers": "Sərnişinlər", "vsLastMonth": "keçən aya nisbətən", "thisMonth": "Bu ay" },
+    "period": {
+      "day": "Gün",
+      "week": "Həftə",
+      "month": "Ay"
+    },
+    "summary": {
+      "revenue": "Aylıq Gəlir",
+      "bookings": "Aylıq Bronlamalar",
+      "passengers": "Sərnişinlər",
+      "vsLastMonth": "keçən aya nisbətən",
+      "thisMonth": "Bu ay"
+    },
     "funnel": {
       "title": "Satış Funeli",
       "views": "Ümumi Baxışlar",
@@ -273,7 +283,9 @@
       "paidToCompleted": "Ödəniş → Tamamlama",
       "overall": "Ümumi Konversiya"
     },
-    "revenue": { "title": "Gəlir Dinamikası" },
+    "revenue": {
+      "title": "Gəlir Dinamikası"
+    },
     "tours": {
       "title": "Tur Performansı",
       "name": "Tur",
@@ -283,8 +295,16 @@
       "conversion": "Konv.",
       "rating": "Reytinq"
     },
-    "geography": { "title": "Coğrafiya", "noData": "Hələ bronlama məlumatı yoxdur" },
-    "sources": { "title": "Trafik Mənbələri", "noData": "Hələ baxış məlumatı yoxdur", "unique": "unikal" }
+    "geography": {
+      "title": "Coğrafiya",
+      "noData": "Hələ bronlama məlumatı yoxdur"
+    },
+    "sources": {
+      "title": "Trafik Mənbələri",
+      "noData": "Hələ baxış məlumatı yoxdur",
+      "unique": "unikal"
+    },
+    "filterAllTours": "Bütün turlar"
   },
   "errors": {
     "notFound": "Səhifə tapılmadı",

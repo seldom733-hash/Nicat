@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import {
@@ -104,6 +104,9 @@ export default function AnalyticsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('day');
   const [days, setDays] = useState(30);
+  const [selectedTourId, setSelectedTourId] = useState<string>('');
+  const [myTours, setMyTours] = useState<TourPerf[]>([]);
+  const myToursLoadedRef = useRef(false);
 
   const fetchAnalytics = useCallback(async () => {
     try {
@@ -114,8 +117,11 @@ export default function AnalyticsPage() {
         return { Authorization: `Bearer ${parsed.accessToken}` };
       })();
 
+      const funnelUrl = selectedTourId
+        ? `${API_BASE}/analytics/funnel?tourId=${selectedTourId}`
+        : `${API_BASE}/analytics/funnel`;
       const [funnelRes, revenueRes, tourRes, geoRes, srcRes, monthRes] = await Promise.all([
-        fetch(`${API_BASE}/analytics/funnel`, { headers }).then((r) => r.json()),
+        fetch(funnelUrl, { headers }).then((r) => r.json()),
         fetch(`${API_BASE}/analytics/revenue?period=${period}&days=${days}`, { headers }).then((r) => r.json()),
         fetch(`${API_BASE}/analytics/tours`, { headers }).then((r) => r.json()),
         fetch(`${API_BASE}/analytics/geography`, { headers }).then((r) => r.json()),
@@ -128,7 +134,12 @@ export default function AnalyticsPage() {
       const funnelData = extract(funnelRes);
       setFunnel(funnelData?.funnel ? funnelData : null);
       setRevenue(Array.isArray(extract(revenueRes)) ? extract(revenueRes) : []);
-      setTourPerf(Array.isArray(extract(tourRes)) ? extract(tourRes) : []);
+      const tours = Array.isArray(extract(tourRes)) ? extract(tourRes) : [];
+      setTourPerf(tours);
+      if (!myToursLoadedRef.current && tours.length > 0) {
+        myToursLoadedRef.current = true;
+        setMyTours(tours);
+      }
       setGeography(Array.isArray(extract(geoRes)) ? extract(geoRes) : []);
       setSources(Array.isArray(extract(srcRes)) ? extract(srcRes) : []);
       setMonthly(extract(monthRes));
@@ -137,7 +148,7 @@ export default function AnalyticsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [period, days]);
+  }, [period, days, selectedTourId]);
 
   useEffect(() => {
     if (authLoading || !isAuthenticated) return;
@@ -162,12 +173,26 @@ export default function AnalyticsPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
             <p className="text-gray-500 mt-1">{t('subtitle')}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Tour Filter */}
+            <select
+              value={selectedTourId}
+              onChange={(e) => setSelectedTourId(e.target.value)}
+              className="px-3 py-1.5 rounded-lg border border-gray-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent-500 min-w-[180px]"
+            >
+              <option value="">{t('filterAllTours')}</option>
+              {myTours.map((tour) => (
+                <option key={tour.id} value={tour.id}>
+                  {tour.title}
+                </option>
+              ))}
+            </select>
+            {/* Period Filter */}
             {(['day', 'week', 'month'] as const).map((p) => (
               <Button
                 key={p}

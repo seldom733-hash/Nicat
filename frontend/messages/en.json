@@ -258,8 +258,18 @@
   "analytics": {
     "title": "Analytics & Sales Funnel",
     "subtitle": "Track your performance, conversions, and revenue",
-    "period": { "day": "Days", "week": "Weeks", "month": "Months" },
-    "summary": { "revenue": "Monthly Revenue", "bookings": "Monthly Bookings", "passengers": "Passengers", "vsLastMonth": "vs last month", "thisMonth": "This month" },
+    "period": {
+      "day": "Days",
+      "week": "Weeks",
+      "month": "Months"
+    },
+    "summary": {
+      "revenue": "Monthly Revenue",
+      "bookings": "Monthly Bookings",
+      "passengers": "Passengers",
+      "vsLastMonth": "vs last month",
+      "thisMonth": "This month"
+    },
     "funnel": {
       "title": "Sales Funnel",
       "views": "Total Views",
@@ -273,7 +283,9 @@
       "paidToCompleted": "Paid → Completed",
       "overall": "Overall Conversion"
     },
-    "revenue": { "title": "Revenue Over Time" },
+    "revenue": {
+      "title": "Revenue Over Time"
+    },
     "tours": {
       "title": "Tour Performance",
       "name": "Tour",
@@ -283,8 +295,16 @@
       "conversion": "Conv.",
       "rating": "Rating"
     },
-    "geography": { "title": "Geography", "noData": "No booking data yet" },
-    "sources": { "title": "Traffic Sources", "noData": "No view data yet", "unique": "unique" }
+    "geography": {
+      "title": "Geography",
+      "noData": "No booking data yet"
+    },
+    "sources": {
+      "title": "Traffic Sources",
+      "noData": "No view data yet",
+      "unique": "unique"
+    },
+    "filterAllTours": "All Tours"
   },
   "errors": {
     "notFound": "Page not found",
