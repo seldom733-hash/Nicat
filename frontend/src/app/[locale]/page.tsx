@@ -19,11 +19,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { toursApi } from '@/lib/api';
 import { formatPrice, getCategoryLabel, getMediaUrl } from '@/lib/utils';
 import { getLocalizedTour } from '@/lib/utils/translate-tour';
 import type { Tour } from '@/lib/api';
-import TourChatWidget from '@/components/chat/TourChatWidget';
+
+const TourChatWidget = dynamic(() => import('@/components/chat/TourChatWidget'), {
+  ssr: false,
+  loading: () => null,
+});
 
 export default function HomePage() {
   const [featuredTours, setFeaturedTours] = useState<Tour[]>([]);
@@ -208,10 +214,13 @@ export default function HomePage() {
                   <Card className="overflow-hidden cursor-pointer group">
                     <div className="relative h-48 bg-gradient-to-br from-blue-500 to-purple-500">
                       {tour.media && tour.media.length > 0 ? (
-                        <img
+                        <Image
                           src={getMediaUrl(tour.media[0].url)}
                           alt={tour.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

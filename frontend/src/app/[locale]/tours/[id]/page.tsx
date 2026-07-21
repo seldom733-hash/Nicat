@@ -7,12 +7,17 @@ import { MapPin, Star, Calendar, Users, Check, X, ArrowLeft } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import dynamic from 'next/dynamic';
 import { toursApi } from '@/lib/api';
 import { formatPrice, getCategoryLabel } from '@/lib/utils';
 import type { Tour } from '@/lib/api';
 import Link from 'next/link';
 import TourGallery from '@/components/tours/TourGallery';
-import TourChatWidget from '@/components/chat/TourChatWidget';
+
+const TourChatWidget = dynamic(() => import('@/components/chat/TourChatWidget'), {
+  ssr: false,
+  loading: () => null,
+});
 
 export default function TourDetailPage() {
   const params = useParams();
