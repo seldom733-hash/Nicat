@@ -124,7 +124,7 @@ export default function AnalyticsPage() {
       ]);
 
       setFunnel(funnelRes);
-      setRevenue(revenueRes);
+      setRevenue(Array.isArray(revenueRes) ? revenueRes : []);
       setTourPerf(Array.isArray(tourRes) ? tourRes : []);
       setGeography(Array.isArray(geoRes) ? geoRes : []);
       setSources(Array.isArray(srcRes) ? srcRes : []);
@@ -153,7 +153,7 @@ export default function AnalyticsPage() {
   const fmtCurrency = (n: number) => `$${n.toLocaleString()}`;
   const fmtPercent = (v: string) => `${v}%`;
 
-  const maxRevenue = Math.max(...revenue.map((r) => parseFloat(r.grossrevenue || '0')), 1);
+  const maxRevenue = revenue.length > 0 ? Math.max(...revenue.map((r) => parseFloat(r.grossrevenue || '0')), 1) : 1;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
