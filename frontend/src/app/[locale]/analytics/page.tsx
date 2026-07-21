@@ -235,7 +235,7 @@ export default function AnalyticsPage() {
         )}
 
         {/* Sales Funnel */}
-        {funnel && (
+        {funnel?.funnel && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
