@@ -604,7 +604,7 @@ export const cityTranslations: Record<string, { ru: string; az: string }> = {
   'Hong Kong': { ru: 'Гонконг', az: 'Honq-Konq' },
   'Guangzhou': { ru: 'Гуанчжоу', az: 'Quancou' },
   'Chengdu': { ru: 'Чэнду', az: 'Çendu' },
-  'Xi'an': { ru: 'Сиань', az: 'Sian' },
+  'Xi\'an': { ru: 'Сиань', az: 'Sian' },
   'Hangzhou': { ru: 'Ханчжоу', az: 'Xancou' },
   'Shenzhen': { ru: 'Шэньчжэнь', az: 'Şenjen' },
   'Lhasa': { ru: 'Лхаса', az: 'Lxasa' },
