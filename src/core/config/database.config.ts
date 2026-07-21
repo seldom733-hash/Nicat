@@ -12,13 +12,16 @@ export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOp
   database: configService.get<string>('DB_DATABASE', 'nicat'),
   entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
 
+  // Connection timeout — prevents app from hanging when DB is unavailable
+  connectTimeoutMS: configService.get<number>('DB_CONNECT_TIMEOUT', 10000),
   // Connection pooling для масштабирования
   poolSize: configService.get<number>('DB_POOL_SIZE', 20),
   extra: {
     max: configService.get<number>('DB_MAX_CONNECTIONS', 20),
     min: configService.get<number>('DB_MIN_CONNECTIONS', 5),
-    acquireTimeoutMillis: configService.get<number>('DB_ACQUIRE_TIMEOUT', 30000),
+    acquireTimeoutMillis: configService.get<number>('DB_ACQUIRE_TIMEOUT', 10000),
     idleTimeoutMillis: configService.get<number>('DB_IDLE_TIMEOUT', 30000),
+    connectionTimeoutMillis: configService.get<number>('DB_CONNECT_TIMEOUT', 10000),
   },
 
   // Schema management

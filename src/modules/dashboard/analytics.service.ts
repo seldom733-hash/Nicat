@@ -12,17 +12,29 @@ export class AnalyticsService {
   /**
    * Sales funnel: views → bookings started → paid → confirmed → completed
    */
-  async getFunnel(hostId: string, tourId?: string) {
-    const tourFilter = tourId ? 'AND t.id = $2' : '';
-    const extraParam = tourId ? [hostId, tourId] : [hostId];
+  async getFunnel(hostId: string, tourId?: string, days?: number) {
+    let tourFilter = tourId ? 'AND t.id = $2' : '';
+    let dateFilter = '';
+    const params: any[] = [hostId];
+    let paramIdx = 2;
+    if (tourId) {
+      params.push(tourId);
+      paramIdx = 3;
+    }
+    if (days) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      dateFilter = ` AND v."viewedAt" >= $${paramIdx}`;
+      params.push(startDate.toISOString());
+    }
 
     // 1. Total views
     const viewsResult = await this.dataSource.query(`
       SELECT COUNT(*)::int AS total
       FROM tour_views v
       INNER JOIN tours t ON v."tourId" = t.id
-      WHERE t."hostId" = $1 ${tourFilter}
-    `, extraParam);
+      WHERE t."hostId" = $1 ${tourFilter}${dateFilter}
+    `, params);
     const totalViews = viewsResult[0]?.total ?? 0;
 
     // 2. Unique visitors
@@ -30,17 +42,30 @@ export class AnalyticsService {
       SELECT COUNT(DISTINCT COALESCE(v."userId"::text, v.id::text))::int AS total
       FROM tour_views v
       INNER JOIN tours t ON v."tourId" = t.id
-      WHERE t."hostId" = $1 ${tourFilter}
-    `, extraParam);
+      WHERE t."hostId" = $1 ${tourFilter}${dateFilter}
+    `, params);
     const uniqueVisitors = uniqueResult[0]?.total ?? 0;
 
     // 3-6. Bookings counts
+    let bookingDateFilter = '';
+    const bookingParams: any[] = [hostId];
+    let bParamIdx = 2;
+    if (tourId) {
+      bookingParams.push(tourId);
+      bParamIdx = 3;
+    }
+    if (days) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      bookingDateFilter = ` AND b."createdAt" >= $${bParamIdx}`;
+      bookingParams.push(startDate.toISOString());
+    }
     const baseWhere = `b."tourId" IN (SELECT id FROM tours WHERE "hostId" = $1${tourId ? ' AND id = $2' : ''})`;
 
-    const bookingsStarted = await this.bookingCount(extraParam, baseWhere, '');
-    const bookingsPaid = await this.bookingCount(extraParam, baseWhere, `AND b.status IN ('confirmed','paid','completed')`);
-    const bookingsCompleted = await this.bookingCount(extraParam, baseWhere, `AND b.status = 'completed'`);
-    const bookingsCancelled = await this.bookingCount(extraParam, baseWhere, `AND b.status = 'cancelled'`);
+    const bookingsStarted = await this.bookingCount(bookingParams, baseWhere, bookingDateFilter);
+    const bookingsPaid = await this.bookingCount(bookingParams, baseWhere, `${bookingDateFilter} AND b.status IN ('confirmed','paid','completed')`);
+    const bookingsCompleted = await this.bookingCount(bookingParams, baseWhere, `${bookingDateFilter} AND b.status = 'completed'`);
+    const bookingsCancelled = await this.bookingCount(bookingParams, baseWhere, `${bookingDateFilter} AND b.status = 'cancelled'`);
 
     const conversionRate = totalViews > 0 ? ((bookingsPaid / totalViews) * 100).toFixed(2) : '0';
 
@@ -103,7 +128,7 @@ export class AnalyticsService {
   /**
    * Tour performance stats
    */
-  async getTourPerformance(hostId: string) {
+  async getTourPerformance(hostId: string, days?: number) {
     const tours = await this.dataSource.query(`
       SELECT
         t.id, t.title, t.status, t.category, t."basePrice",
@@ -118,15 +143,23 @@ export class AnalyticsService {
     const tourIds = tours.map((_: any, i: number) => `$${i + 1}`);
     const tourIdParams = tours.map((t: any) => t.id);
 
+    let dateFilter = '';
+    const allParams: any[] = [...tourIdParams];
+    if (days) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      dateFilter = ` AND v."viewedAt" >= $${tourIds.length + 1}`;
+      allParams.push(startDate.toISOString());
+    }
     const viewsPerTour = await this.dataSource.query(`
       SELECT
         v."tourId",
         COUNT(*)::int AS views,
         COUNT(DISTINCT COALESCE(v."userId"::text, v.id::text))::int AS "uniqueVisitors"
       FROM tour_views v
-      WHERE v."tourId" IN (${tourIds.join(',')})
+      WHERE v."tourId" IN (${tourIds.join(',')})${dateFilter}
       GROUP BY v."tourId"
-    `, tourIdParams);
+    `, allParams);
 
     const bookingsPerTour = await this.dataSource.query(`
       SELECT
@@ -135,9 +168,9 @@ export class AnalyticsService {
         SUM(CASE WHEN b.status IN ('confirmed','paid','completed') THEN 1 ELSE 0 END)::int AS "paidBookings",
         SUM(b."totalBasePrice")::numeric AS revenue
       FROM bookings b
-      WHERE b."tourId" IN (${tourIds.join(',')})
+      WHERE b."tourId" IN (${tourIds.join(',')})${dateFilter ? ` AND b."createdAt" >= $${tourIds.length + 1}` : ''}
       GROUP BY b."tourId"
-    `, tourIdParams);
+    `, allParams);
 
     const viewsMap = new Map<string, { views: number; uniqueVisitors: number }>(viewsPerTour.map((v: any) => [v.tourId, { views: v.views, uniqueVisitors: v.uniqueVisitors }]));
     const bookingsMap = new Map<string, { totalBookings: number; paidBookings: number; revenue: number }>(bookingsPerTour.map((b: any) => [b.tourId, {
@@ -172,7 +205,15 @@ export class AnalyticsService {
   /**
    * Geography breakdown — where bookings come from
    */
-  async getGeography(hostId: string) {
+  async getGeography(hostId: string, days?: number) {
+    let dateFilter = '';
+    const params: any[] = [hostId];
+    if (days) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      dateFilter = ' AND b."createdAt" >= $2';
+      params.push(startDate.toISOString());
+    }
     const data = await this.dataSource.query(`
       SELECT
         t.country AS "tourCountry",
@@ -182,10 +223,10 @@ export class AnalyticsService {
       FROM bookings b
       INNER JOIN tours t ON b."tourId" = t.id
       WHERE t."hostId" = $1
-        AND b.status IN ('confirmed','paid','completed')
+        AND b.status IN ('confirmed','paid','completed')${dateFilter}
       GROUP BY t.country
       ORDER BY bookings DESC
-    `, [hostId]);
+    `, params);
 
     return data;
   }
@@ -193,7 +234,15 @@ export class AnalyticsService {
   /**
    * Source breakdown — how visitors find tours
    */
-  async getSources(hostId: string) {
+  async getSources(hostId: string, days?: number) {
+    let dateFilter = '';
+    const params: any[] = [hostId];
+    if (days) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      dateFilter = ' AND v."viewedAt" >= $2';
+      params.push(startDate.toISOString());
+    }
     const data = await this.dataSource.query(`
       SELECT
         v.source,
@@ -201,10 +250,10 @@ export class AnalyticsService {
         COUNT(DISTINCT COALESCE(v."userId"::text, v.id::text))::int AS "uniqueVisitors"
       FROM tour_views v
       INNER JOIN tours t ON v."tourId" = t.id
-      WHERE t."hostId" = $1
+      WHERE t."hostId" = $1${dateFilter}
       GROUP BY v.source
       ORDER BY views DESC
-    `, [hostId]);
+    `, params);
 
     return data;
   }

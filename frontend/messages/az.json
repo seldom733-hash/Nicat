@@ -305,11 +305,13 @@
       "unique": "unikal"
     },
     "filterAllTours": "Bütün turlar",
-    "analytics.range.last7": "Son 7 gün",
-    "analytics.range.last30": "Son 30 gün",
-    "analytics.range.last90": "Son 90 gün",
-    "analytics.range.thisYear": "Bu il",
-    "analytics.range.allTime": "Bütün zamanlar"
+    "range": {
+      "last7": "Son 7 gün",
+      "last30": "Son 30 gün",
+      "last90": "Son 90 gün",
+      "thisYear": "Bu il",
+      "allTime": "Bütün zamanlar"
+    }
   },
   "errors": {
     "notFound": "Səhifə tapılmadı",

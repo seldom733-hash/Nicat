@@ -26,15 +26,16 @@ export class AnalyticsController {
   ) {}
 
   /**
-   * GET /analytics/funnel?tourId=optional
+   * GET /analytics/funnel?tourId=optional&days=30
    * Sales funnel: views → bookings → paid → completed
    */
   @Get('funnel')
   async getFunnel(
     @Request() req,
     @Query('tourId') tourId?: string,
+    @Query('days') days?: number,
   ) {
-    return this.analyticsService.getFunnel(req.user.id, tourId);
+    return this.analyticsService.getFunnel(req.user.id, tourId, days);
   }
 
   /**
@@ -55,30 +56,39 @@ export class AnalyticsController {
   }
 
   /**
-   * GET /analytics/tours
+   * GET /analytics/tours?days=30
    * Tour performance comparison
    */
   @Get('tours')
-  async getTourPerformance(@Request() req) {
-    return this.analyticsService.getTourPerformance(req.user.id);
+  async getTourPerformance(
+    @Request() req,
+    @Query('days') days?: number,
+  ) {
+    return this.analyticsService.getTourPerformance(req.user.id, days);
   }
 
   /**
-   * GET /analytics/geography
+   * GET /analytics/geography?days=30
    * Where bookings come from (by country)
    */
   @Get('geography')
-  async getGeography(@Request() req) {
-    return this.analyticsService.getGeography(req.user.id);
+  async getGeography(
+    @Request() req,
+    @Query('days') days?: number,
+  ) {
+    return this.analyticsService.getGeography(req.user.id, days);
   }
 
   /**
-   * GET /analytics/sources
+   * GET /analytics/sources?days=30
    * How visitors find tours
    */
   @Get('sources')
-  async getSources(@Request() req) {
-    return this.analyticsService.getSources(req.user.id);
+  async getSources(
+    @Request() req,
+    @Query('days') days?: number,
+  ) {
+    return this.analyticsService.getSources(req.user.id, days);
   }
 
   /**

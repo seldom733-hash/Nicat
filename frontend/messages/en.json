@@ -305,11 +305,13 @@
       "unique": "unique"
     },
     "filterAllTours": "All Tours",
-    "analytics.range.last7": "Last 7 days",
-    "analytics.range.last30": "Last 30 days",
-    "analytics.range.last90": "Last 90 days",
-    "analytics.range.thisYear": "This year",
-    "analytics.range.allTime": "All time"
+    "range": {
+      "last7": "Last 7 days",
+      "last30": "Last 30 days",
+      "last90": "Last 90 days",
+      "thisYear": "This year",
+      "allTime": "All time"
+    }
   },
   "errors": {
     "notFound": "Page not found",

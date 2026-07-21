@@ -90,11 +90,11 @@ interface MonthlyData {
 const API_BASE = '/api/v1';
 
 const DATE_RANGES = [
-  { value: '7', labelKey: 'analytics.range.last7' },
-  { value: '30', labelKey: 'analytics.range.last30' },
-  { value: '90', labelKey: 'analytics.range.last90' },
-  { value: '365', labelKey: 'analytics.range.thisYear' },
-  { value: '1825', labelKey: 'analytics.range.allTime' },
+  { value: '7', labelKey: 'range.last7' },
+  { value: '30', labelKey: 'range.last30' },
+  { value: '90', labelKey: 'range.last90' },
+  { value: '365', labelKey: 'range.thisYear' },
+  { value: '1825', labelKey: 'range.allTime' },
 ];
 
 export default function AnalyticsPage() {
@@ -123,11 +123,11 @@ export default function AnalyticsPage() {
       })();
 
       const [funnelRes, revenueRes, tourRes, geoRes, srcRes, monthRes] = await Promise.all([
-        fetch(`${API_BASE}/analytics/funnel`, { headers }).then((r) => r.json()),
+        fetch(`${API_BASE}/analytics/funnel?days=${dateRange}`, { headers }).then((r) => r.json()),
         fetch(`${API_BASE}/analytics/revenue?period=${period}&days=${dateRange}`, { headers }).then((r) => r.json()),
-        fetch(`${API_BASE}/analytics/tours`, { headers }).then((r) => r.json()),
-        fetch(`${API_BASE}/analytics/geography`, { headers }).then((r) => r.json()),
-        fetch(`${API_BASE}/analytics/sources`, { headers }).then((r) => r.json()),
+        fetch(`${API_BASE}/analytics/tours?days=${dateRange}`, { headers }).then((r) => r.json()),
+        fetch(`${API_BASE}/analytics/geography?days=${dateRange}`, { headers }).then((r) => r.json()),
+        fetch(`${API_BASE}/analytics/sources?days=${dateRange}`, { headers }).then((r) => r.json()),
         fetch(`${API_BASE}/analytics/monthly`, { headers }).then((r) => r.json()),
       ]);
 

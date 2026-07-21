@@ -26,9 +26,18 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         }
       });
 
-      await this.redis.connect();
-    } catch {
-      this.logger.warn('Redis недоступен, кэширование отключено');
+      // connect() respects connectTimeout from config (3000ms default)
+      // and won't hang if Redis is unreachable
+      await Promise.race([
+        this.redis.connect(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Redis connect timeout')), 5000),
+        ),
+      ]);
+    } catch (error) {
+      this.logger.warn(`Redis недоступен (${error?.message || error}), кэширование отключено`);
+      // Nullify redis so isAvailable() returns false safely
+      this.redis = null as any;
     }
   }
 

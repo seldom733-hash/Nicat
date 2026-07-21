@@ -22,14 +22,20 @@ export class QueueService implements OnModuleInit {
       // Test if Redis is reachable by getting the client
       const client = this.emailQueue.client;
       if (client && typeof client.connect === 'function') {
-        await client.connect();
+        // Connect with a timeout to prevent hanging if Redis is unreachable
+        await Promise.race([
+          client.connect(),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Queue Redis connect timeout')), 5000),
+          ),
+        ]);
       }
       this.isRedisAvailable = true;
       this.logger.log('Queue Service инициализирован (Redis доступен)');
       await this.logQueueStats();
     } catch (error) {
       this.isRedisAvailable = false;
-      this.logger.warn(`Redis недоступен для очередей (${error.message}), фоновые задачи отключены`);
+      this.logger.warn(`Redis недоступен для очередей (${error?.message || error}), фоновые задачи отключены`);
     }
   }
 
