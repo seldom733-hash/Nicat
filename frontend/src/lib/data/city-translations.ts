@@ -585,7 +585,7 @@ export const cityTranslations: Record<string, { ru: string; az: string }> = {
   'Dhaka': { ru: 'Дакка', az: 'Dakka' },
   'Chittagong': { ru: 'Читтагонг', az: 'Çittakonq' },
   'Sylhet': { ru: 'Силхет', az: 'Silhet' },
-  'Cox's Bazar': { ru: 'Кокс-Базар', az: 'Koks-Bazar' },
+  'Cox\'s Bazar': { ru: 'Кокс-Базар', az: 'Koks-Bazar' },
   'Thimphu': { ru: 'Тхимпху', az: 'Thimphu' },
   'Paro': { ru: 'Паро', az: 'Paro' },
   'Punakha': { ru: 'Пунакха', az: 'Punakha' },
