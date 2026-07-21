@@ -120,29 +120,44 @@ export default function AnalyticsPage() {
       const funnelUrl = selectedTourId
         ? `${API_BASE}/analytics/funnel?tourId=${selectedTourId}`
         : `${API_BASE}/analytics/funnel`;
+
+      // Use allSettled so one failed endpoint doesn't kill all data
+      const safeFetch = async (url: string) => {
+        try {
+          const res = await fetch(url, { headers });
+          if (!res.ok) return null;
+          return await res.json();
+        } catch { return null; }
+      };
+      const extract = (r: any) => r?.data ?? r;
+
       const [funnelRes, revenueRes, tourRes, geoRes, srcRes, monthRes] = await Promise.all([
-        fetch(funnelUrl, { headers }).then((r) => r.json()),
-        fetch(`${API_BASE}/analytics/revenue?period=${period}&days=${days}`, { headers }).then((r) => r.json()),
-        fetch(`${API_BASE}/analytics/tours`, { headers }).then((r) => r.json()),
-        fetch(`${API_BASE}/analytics/geography`, { headers }).then((r) => r.json()),
-        fetch(`${API_BASE}/analytics/sources`, { headers }).then((r) => r.json()),
-        fetch(`${API_BASE}/analytics/monthly`, { headers }).then((r) => r.json()),
+        safeFetch(funnelUrl),
+        safeFetch(`${API_BASE}/analytics/revenue?period=${period}&days=${days}`),
+        safeFetch(`${API_BASE}/analytics/tours`),
+        safeFetch(`${API_BASE}/analytics/geography`),
+        safeFetch(`${API_BASE}/analytics/sources`),
+        safeFetch(`${API_BASE}/analytics/monthly`),
       ]);
 
-      // Extract .data from TransformInterceptor wrapper { data, timestamp, path }
-      const extract = (r: any) => r?.data ?? r;
       const funnelData = extract(funnelRes);
-      setFunnel(funnelData?.funnel ? funnelData : null);
-      setRevenue(Array.isArray(extract(revenueRes)) ? extract(revenueRes) : []);
-      const tours = Array.isArray(extract(tourRes)) ? extract(tourRes) : [];
-      setTourPerf(tours);
-      if (!myToursLoadedRef.current && tours.length > 0) {
-        myToursLoadedRef.current = true;
-        setMyTours(tours);
+      if (funnelData?.funnel) setFunnel(funnelData);
+      const revData = extract(revenueRes);
+      if (Array.isArray(revData)) setRevenue(revData);
+      const tours = extract(tourRes);
+      if (Array.isArray(tours)) {
+        setTourPerf(tours);
+        if (!myToursLoadedRef.current && tours.length > 0) {
+          myToursLoadedRef.current = true;
+          setMyTours(tours);
+        }
       }
-      setGeography(Array.isArray(extract(geoRes)) ? extract(geoRes) : []);
-      setSources(Array.isArray(extract(srcRes)) ? extract(srcRes) : []);
-      setMonthly(extract(monthRes));
+      const geoData = extract(geoRes);
+      if (Array.isArray(geoData)) setGeography(geoData);
+      const srcData = extract(srcRes);
+      if (Array.isArray(srcData)) setSources(srcData);
+      const monthData = extract(monthRes);
+      if (monthData?.currentMonth) setMonthly(monthData);
     } catch (err) {
       console.error('Failed to load analytics:', err);
     } finally {
