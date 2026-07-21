@@ -9,7 +9,11 @@ export const getQueueConfig = (
     host: redisHost,
     port: redisPort,
     password: redisPassword || undefined,
-    maxRetriesPerRequest: 3,
+    maxRetriesPerRequest: 0,
+    enableReadyCheck: false,
+    lazyConnect: true,
+    connectTimeout: 3000,
+    retryStrategy: () => null,
   },
 });
 

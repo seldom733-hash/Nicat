@@ -4,7 +4,9 @@ import { ConfigService } from '@nestjs/config';
 export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
   type: 'postgres',
   host: configService.get<string>('DB_HOST', 'localhost'),
-  port: configService.get<number>('DB_PORT', 5432),
+  // Default port 5433 = local PostgreSQL stored in pgdata/ (inside the project)
+  // Override via DB_PORT env var to use system PostgreSQL (5432) or Docker
+  port: configService.get<number>('DB_PORT', 5433),
   username: configService.get<string>('DB_USERNAME', 'postgres'),
   password: configService.get<string>('DB_PASSWORD', 'postgres'),
   database: configService.get<string>('DB_DATABASE', 'nicat'),

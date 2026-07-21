@@ -31,7 +31,7 @@ export default function ProfilePage() {
           <CardContent className="p-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-700 to-primary-500 flex items-center justify-center text-white text-2xl font-bold">
                   {user?.firstName?.[0]}{user?.lastName?.[0]}
                 </div>
                 <div className="ml-6">
@@ -105,7 +105,7 @@ export default function ProfilePage() {
                 <textarea
                   value={formData.bio}
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-500"
                   rows={4}
                   disabled={!isEditing}
                 />

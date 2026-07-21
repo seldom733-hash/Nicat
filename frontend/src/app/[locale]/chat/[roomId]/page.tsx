@@ -176,7 +176,7 @@ export default function ChatRoomPage() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium mr-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-700 to-primary-500 rounded-full flex items-center justify-center text-white font-medium mr-3">
               <Users className="h-5 w-5" />
             </div>
             <div>
@@ -229,7 +229,7 @@ export default function ChatRoomPage() {
                     }`}
                   >
                     {!isOwn && (
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary-700 to-primary-500 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
                         {message.sender?.firstName
                           ? getInitials(
                               message.sender.firstName,
@@ -242,7 +242,7 @@ export default function ChatRoomPage() {
                       <div
                         className={`px-4 py-2 rounded-2xl ${
                           isOwn
-                            ? 'bg-blue-600 text-white rounded-br-md'
+                            ? 'bg-primary-800 text-white rounded-br-md'
                             : 'bg-white border border-gray-200 text-gray-900 rounded-bl-md'
                         }`}
                       >
@@ -293,7 +293,7 @@ export default function ChatRoomPage() {
             }}
             onBlur={() => handleTyping(false)}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
             disabled={isSending}
           />
           <Button

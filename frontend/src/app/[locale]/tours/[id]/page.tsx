@@ -11,6 +11,8 @@ import { toursApi } from '@/lib/api';
 import { formatPrice, getCategoryLabel } from '@/lib/utils';
 import type { Tour } from '@/lib/api';
 import Link from 'next/link';
+import TourGallery from '@/components/tours/TourGallery';
+import TourChatWidget from '@/components/chat/TourChatWidget';
 
 export default function TourDetailPage() {
   const params = useParams();
@@ -61,23 +63,19 @@ export default function TourDetailPage() {
         </Link>
 
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="relative h-96 bg-gradient-to-br from-blue-500 to-purple-500">
-            {tour.media && tour.media.length > 0 ? (
-              <img
-                src={tour.media[0].url}
-                alt={tour.title}
-                className="w-full h-full object-cover"
-              />
-            ) : null}
-            <Badge className="absolute top-4 left-4">
-              {getCategoryLabel(tour.category)}
-            </Badge>
+          <div className="p-8 pb-0">
+            <div className="flex items-center gap-3 mb-4">
+              <h1 className="text-3xl font-bold text-gray-900">{tour.title}</h1>
+              <Badge>{getCategoryLabel(tour.category, locale)}</Badge>
+            </div>
           </div>
 
-          <div className="p-8">
+          {/* Gallery — centered, not bound by container */}
+          <TourGallery media={tour.media} title={tour.title} />
+
+          <div className="p-8 pt-0">
             <div className="flex flex-col lg:flex-row lg:justify-between gap-8">
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">{tour.title}</h1>
                 <div className="flex items-center text-gray-600 mb-4">
                   <MapPin className="h-5 w-5 mr-2" />
                   {tour.city}, {tour.country}
@@ -145,6 +143,10 @@ export default function TourDetailPage() {
                         {t('bookNow')}
                       </Button>
                     </Link>
+
+                    <div className="mt-3">
+                      <TourChatWidget tour={tour} variant="button" />
+                    </div>
                   </CardContent>
                 </Card>
               </div>

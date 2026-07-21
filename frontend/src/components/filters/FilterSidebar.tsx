@@ -16,9 +16,13 @@ interface FilterSidebarProps {
   selectedCountries: string[];
   selectedCities: string[];
   selectedServices: string[];
+  selectedDuration: string | null;
+  selectedPrice: string | null;
   onCountriesChange: (countries: string[]) => void;
   onCitiesChange: (cities: string[]) => void;
   onServicesChange: (services: string[]) => void;
+  onDurationChange: (duration: string | null) => void;
+  onPriceChange: (price: string | null) => void;
   onReset: () => void;
 }
 
@@ -60,17 +64,20 @@ function CollapsibleSection({ title, count, defaultOpen = true, children }: Coll
 
 function Checkbox({ checked, onChange }: { checked: boolean; onChange: () => void }) {
   return (
-    <button
-      type="button"
+    <div
+      role="checkbox"
+      aria-checked={checked}
+      tabIndex={0}
       onClick={onChange}
-      className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+      onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onChange(); } }}
+      className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors cursor-pointer ${
         checked
-          ? 'bg-blue-600 border-blue-600'
+          ? 'bg-primary-800 border-primary-800'
           : 'border-gray-300 hover:border-gray-400'
       }`}
     >
       {checked && <Check className="h-3 w-3 text-white" />}
-    </button>
+    </div>
   );
 }
 
@@ -78,9 +85,13 @@ export default function FilterSidebar({
   selectedCountries,
   selectedCities,
   selectedServices,
+  selectedDuration,
+  selectedPrice,
   onCountriesChange,
   onCitiesChange,
   onServicesChange,
+  onDurationChange,
+  onPriceChange,
   onReset,
 }: FilterSidebarProps) {
   const t = useTranslations('explore.filters');
@@ -167,7 +178,8 @@ export default function FilterSidebar({
   };
 
   const activeFiltersCount =
-    selectedCountries.length + selectedCities.length + selectedServices.length;
+    selectedCountries.length + selectedCities.length + selectedServices.length +
+    (selectedDuration ? 1 : 0) + (selectedPrice ? 1 : 0);
 
   return (
     <div className="w-full lg:w-80 flex-shrink-0">
@@ -178,7 +190,7 @@ export default function FilterSidebar({
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-gray-900">{t('title')}</h3>
               {activeFiltersCount > 0 && (
-                <Badge className="bg-blue-600 text-white text-xs px-2 py-0.5">
+                <Badge className="bg-primary-800 text-white text-xs px-2 py-0.5">
                   {activeFiltersCount}
                 </Badge>
               )}
@@ -186,7 +198,7 @@ export default function FilterSidebar({
             {activeFiltersCount > 0 && (
               <button
                 onClick={onReset}
-                className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                className="text-sm text-primary-700 hover:text-primary-800 flex items-center gap-1"
               >
                 <X className="h-3 w-3" />
                 {tCommon('clear')}
@@ -197,7 +209,7 @@ export default function FilterSidebar({
 
         {/* Active Filters Summary */}
         {activeFiltersCount > 0 && (
-          <div className="px-4 py-2 border-b border-gray-200 bg-blue-50">
+          <div className="px-4 py-2 border-b border-gray-200 bg-primary-950/5">
             <div className="flex flex-wrap gap-1.5">
               {selectedCountries.map(name => {
                 const country = countries.find(c => c.name === name);
@@ -205,10 +217,10 @@ export default function FilterSidebar({
                   <Badge
                     key={name}
                     variant="outline"
-                    className="bg-white text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100"
+                    className="bg-white text-primary-800 border-primary-950/15 cursor-pointer hover:bg-primary-950/10"
                     onClick={() => toggleCountry(country?.code || '', name)}
                   >
-                    {country?.name || name}
+                    {country ? getLocalizedName(country, locale) : name}
                     <X className="h-3 w-3 ml-1" />
                   </Badge>
                 );
@@ -217,22 +229,21 @@ export default function FilterSidebar({
                 <Badge
                   key={city}
                   variant="outline"
-                  className="bg-white text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100"
+                  className="bg-white text-primary-800 border-primary-950/15 cursor-pointer hover:bg-primary-950/10"
                   onClick={() => onCitiesChange(selectedCities.filter(c => c !== city))}
                 >
                   {city}
                   <X className="h-3 w-3 ml-1" />
                 </Badge>
               ))}
-              {selectedServices.length > 0 && (
-                <Badge
-                  variant="outline"
-                  className="bg-white text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100"
-                  onClick={() => onServicesChange([])}
-                >
-                  {selectedServices.length} services
-                  <X className="h-3 w-3 ml-1" />
-                </Badge>
+              {selectedServices.length > 0 && (                  <Badge
+                    variant="outline"
+                    className="bg-white text-primary-800 border-primary-950/15 cursor-pointer hover:bg-primary-950/10"
+                    onClick={() => onServicesChange([])}
+                  >
+                    {selectedServices.length} {t('services').toLowerCase()}
+                    <X className="h-3 w-3 ml-1" />
+                  </Badge>
               )}
             </div>
           </div>
@@ -251,7 +262,7 @@ export default function FilterSidebar({
               placeholder={t('searchCountry')}
               value={countrySearch}
               onChange={(e) => setCountrySearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 text-gray-900"
             />
           </div>
           <div className="mt-2 max-h-80 overflow-y-auto space-y-0.5 scrollbar-thin scrollbar-thumb-gray-300">
@@ -275,7 +286,7 @@ export default function FilterSidebar({
                     >                       <span className="ml-2 font-medium">{getLocalizedName(country, locale)}</span>
                       <div className="flex items-center gap-1">
                         {selectedCitiesCount > 0 && (
-                          <span className="text-xs text-blue-600 font-medium">
+                          <span className="text-xs text-primary-700 font-medium">
                             {selectedCitiesCount} {t('citiesUnit')}
                           </span>
                         )}
@@ -305,7 +316,7 @@ export default function FilterSidebar({
                             <button
                               className={`flex-1 text-left px-2 py-1 text-xs rounded transition-colors ${
                                 isCitySelected
-                                  ? 'text-blue-600 font-medium bg-blue-50'
+                                  ? 'text-primary-700 font-medium bg-primary-950/5'
                                   : 'text-gray-600 hover:bg-gray-50'
                               }`}
                               onClick={() => toggleCity(country.code, city)}
@@ -320,6 +331,65 @@ export default function FilterSidebar({
                 </div>
               );
             })}
+          </div>
+        </CollapsibleSection>
+
+        {/* Duration Filter */}
+        <CollapsibleSection
+          title={t('duration')}
+          count={selectedDuration ? 1 : 0}
+          defaultOpen={false}
+        >
+          <div className="space-y-1">
+            {[
+              { label: '1-3', value: '1-3' },
+              { label: '4-7', value: '4-7' },
+              { label: '8-14', value: '8-14' },
+              { label: '15+', value: '15+' },
+            ].map((d) => (
+              <button
+                key={d.value}
+                className={`w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center gap-2 ${
+                  selectedDuration === d.value
+                    ? 'bg-primary-950/10 text-primary-800 font-medium'
+                    : 'hover:bg-gray-100 text-gray-700'
+                }`}
+                onClick={() => onDurationChange(selectedDuration === d.value ? null : d.value)}
+              >
+                <Checkbox checked={selectedDuration === d.value} onChange={() => {}} />
+                <span>{d.label} {t('daysUnit')}</span>
+              </button>
+            ))}
+          </div>
+        </CollapsibleSection>
+
+        {/* Price Range Filter */}
+        <CollapsibleSection
+          title={t('priceRange')}
+          count={selectedPrice ? 1 : 0}
+          defaultOpen={false}
+        >
+          <div className="space-y-1">
+            {[
+              { label: '<$100', value: '0-100' },
+              { label: '$100-$300', value: '100-300' },
+              { label: '$300-$500', value: '300-500' },
+              { label: '$500-$1000', value: '500-1000' },
+              { label: '$1000+', value: '1000-99999' },
+            ].map((p) => (
+              <button
+                key={p.value}
+                className={`w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center gap-2 ${
+                  selectedPrice === p.value
+                    ? 'bg-primary-950/10 text-primary-800 font-medium'
+                    : 'hover:bg-gray-100 text-gray-700'
+                }`}
+                onClick={() => onPriceChange(selectedPrice === p.value ? null : p.value)}
+              >
+                <Checkbox checked={selectedPrice === p.value} onChange={() => {}} />
+                <span>{p.label}</span>
+              </button>
+            ))}
           </div>
         </CollapsibleSection>
 
@@ -338,7 +408,7 @@ export default function FilterSidebar({
               placeholder={t('searchServices')}
               value={serviceSearch}
               onChange={(e) => setServiceSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 text-gray-900"
             />
           </div>
           <div className="mt-2 max-h-64 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-300">
@@ -361,7 +431,7 @@ export default function FilterSidebar({
                         key={service.id}
                         className={`w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center gap-2 ${
                           selectedServices.includes(service.id)
-                            ? 'bg-blue-100 text-blue-700 font-medium'
+                            ? 'bg-primary-950/10 text-primary-800 font-medium'
                             : 'hover:bg-gray-100 text-gray-700'
                         }`}
                         onClick={() => toggleService(service.id)}
@@ -369,7 +439,7 @@ export default function FilterSidebar({
                         <div
                           className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center ${
                             selectedServices.includes(service.id)
-                              ? 'bg-blue-600 border-blue-600'
+                              ? 'bg-primary-800 border-primary-800'
                               : 'border-gray-300'
                           }`}
                         >

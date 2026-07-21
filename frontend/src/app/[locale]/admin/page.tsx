@@ -202,8 +202,8 @@ export default function AdminPage() {
                           {stats.totalUsers}
                         </p>
                       </div>
-                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <Users className="h-6 w-6 text-blue-600" />
+                      <div className="w-12 h-12 bg-primary-950/10 rounded-xl flex items-center justify-center">
+                        <Users className="h-6 w-6 text-primary-700" />
                       </div>
                     </div>
                     <p className="text-sm text-green-600 mt-2">
@@ -221,11 +221,11 @@ export default function AdminPage() {
                           {stats.totalTours}
                         </p>
                       </div>
-                      <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                        <Compass className="h-6 w-6 text-purple-600" />
+                      <div className="w-12 h-12 bg-primary-950/10 rounded-xl flex items-center justify-center">
+                        <Compass className="h-6 w-6 text-primary-700" />
                       </div>
                     </div>
-                    <p className="text-sm text-yellow-600 mt-2">
+                    <p className="text-sm text-accent-600 mt-2">
                       Pending: {stats.pendingTours}
                     </p>
                   </CardContent>
@@ -256,8 +256,8 @@ export default function AdminPage() {
                           {formatPrice(stats.totalRevenue)}
                         </p>
                       </div>
-                      <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                        <DollarSign className="h-6 w-6 text-yellow-600" />
+                      <div className="w-12 h-12 bg-accent-500/15 rounded-xl flex items-center justify-center">
+                        <DollarSign className="h-6 w-6 text-accent-600" />
                       </div>
                     </div>
                   </CardContent>
@@ -270,7 +270,7 @@ export default function AdminPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Clock className="h-5 w-5 mr-2 text-yellow-500" />
+                    <Clock className="h-5 w-5 mr-2 text-accent-500" />
                     Tours Pending Review
                   </CardTitle>
                 </CardHeader>
@@ -321,7 +321,7 @@ export default function AdminPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Users className="h-5 w-5 mr-2 text-blue-500" />
+                    <Users className="h-5 w-5 mr-2 text-primary-600" />
                     Recent Users
                   </CardTitle>
                 </CardHeader>
@@ -334,7 +334,7 @@ export default function AdminPage() {
                           className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
                         >
                           <div className="flex items-center">
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-primary-700 to-primary-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
                               {u.firstName[0]}
                               {u.lastName[0]}
                             </div>
@@ -376,7 +376,7 @@ export default function AdminPage() {
                   placeholder="Search users..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-500"
                 />
               </div>
             </div>
@@ -406,7 +406,7 @@ export default function AdminPage() {
                         <tr key={u.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-primary-700 to-primary-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
                                 {u.firstName[0]}
                                 {u.lastName[0]}
                               </div>
@@ -424,8 +424,8 @@ export default function AdminPage() {
                                 u.role === 'admin'
                                   ? 'bg-red-100 text-red-700'
                                   : u.role === 'host'
-                                  ? 'bg-purple-100 text-purple-700'
-                                  : 'bg-blue-100 text-blue-700'
+                                  ? 'bg-primary-950/10 text-primary-800'
+                                  : 'bg-primary-950/10 text-primary-800'
                               }
                             >
                               {u.role === 'admin'
@@ -471,7 +471,7 @@ export default function AdminPage() {
                   placeholder="Search tours..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-500"
                 />
               </div>
             </div>

@@ -30,7 +30,7 @@ export default function LoginPage() {
 
     try {
       const response = await authApi.login(email, password);
-      localStorage.setItem('tokens', JSON.stringify(response.tokens));
+      localStorage.setItem('tokens', JSON.stringify({ accessToken: response.accessToken, refreshToken: response.refreshToken }));
       localStorage.setItem('user', JSON.stringify(response.user));
       setUser(response.user);
       router.push(`/${locale}/dashboard`);
@@ -97,7 +97,7 @@ export default function LoginPage() {
                 <input type="checkbox" className="rounded border-gray-300 mr-2" />
                 <span className="text-sm text-gray-600">{t('rememberMe')}</span>
               </label>
-              <a href="#" className="text-sm text-blue-600 hover:underline">{t('forgotPassword')}</a>
+              <a href="#" className="text-sm text-primary-700 hover:underline">{t('forgotPassword')}</a>
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
@@ -108,7 +108,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               {t('noAccount')}{' '}
-              <Link href={`/${locale}/auth/register`} className="text-blue-600 hover:underline font-medium">
+              <Link href={`/${locale}/auth/register`} className="text-primary-700 hover:underline font-medium">
                 {t('signUp')}
               </Link>
             </p>

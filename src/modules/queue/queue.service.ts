@@ -6,6 +6,7 @@ import { QueueNames, JobNames } from '../../core/config/queue.config';
 @Injectable()
 export class QueueService implements OnModuleInit {
   private readonly logger = new Logger(QueueService.name);
+  private isRedisAvailable = false;
 
   constructor(
     @InjectQueue(QueueNames.EMAIL) private emailQueue: Queue,
@@ -17,13 +18,33 @@ export class QueueService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    this.logger.log('Queue Service инициализирован');
-    await this.logQueueStats();
+    try {
+      // Test if Redis is reachable by getting the client
+      const client = this.emailQueue.client;
+      if (client && typeof client.connect === 'function') {
+        await client.connect();
+      }
+      this.isRedisAvailable = true;
+      this.logger.log('Queue Service инициализирован (Redis доступен)');
+      await this.logQueueStats();
+    } catch (error) {
+      this.isRedisAvailable = false;
+      this.logger.warn(`Redis недоступен для очередей (${error.message}), фоновые задачи отключены`);
+    }
+  }
+
+  private checkRedis(): boolean {
+    if (!this.isRedisAvailable) {
+      this.logger.debug('Redis недоступен, операция очереди пропущена');
+      return false;
+    }
+    return true;
   }
 
   // ==================== Email ====================
 
   async sendWelcomeEmail(data: { email: string; firstName: string }) {
+    if (!this.checkRedis()) return;
     return this.emailQueue.add(JobNames.SEND_WELCOME_EMAIL, data, {
       attempts: 3,
       backoff: { type: 'exponential', delay: 2000 },
@@ -38,6 +59,7 @@ export class QueueService implements OnModuleInit {
     tourDate: string;
     totalPrice: number;
   }) {
+    if (!this.checkRedis()) return;
     return this.emailQueue.add(JobNames.SEND_BOOKING_CONFIRMATION, data, {
       attempts: 3,
       backoff: { type: 'exponential', delay: 2000 },
@@ -51,6 +73,7 @@ export class QueueService implements OnModuleInit {
     amount: number;
     currency: string;
   }) {
+    if (!this.checkRedis()) return;
     return this.emailQueue.add(JobNames.SEND_PAYMENT_RECEIPT, data, {
       attempts: 3,
       backoff: { type: 'exponential', delay: 2000 },
@@ -66,6 +89,7 @@ export class QueueService implements OnModuleInit {
     amount: number;
     currency: string;
   }) {
+    if (!this.checkRedis()) return;
     return this.paymentQueue.add(JobNames.PROCESS_PAYMENT, data, {
       attempts: 5,
       backoff: { type: 'exponential', delay: 5000 },
@@ -75,6 +99,7 @@ export class QueueService implements OnModuleInit {
   }
 
   async handleWebhook(data: { eventType: string; payload: any }) {
+    if (!this.checkRedis()) return;
     return this.paymentQueue.add(JobNames.HANDLE_WEBHOOK, data, {
       attempts: 3,
       backoff: { type: 'exponential', delay: 2000 },
@@ -90,6 +115,7 @@ export class QueueService implements OnModuleInit {
     body: string;
     data?: any;
   }) {
+    if (!this.checkRedis()) return;
     return this.notificationQueue.add(JobNames.SEND_PUSH_NOTIFICATION, data, {
       attempts: 3,
       removeOnComplete: true,
@@ -103,6 +129,7 @@ export class QueueService implements OnModuleInit {
     message: string;
     metadata?: any;
   }) {
+    if (!this.checkRedis()) return;
     return this.notificationQueue.add(JobNames.SEND_IN_APP_NOTIFICATION, data, {
       attempts: 3,
       removeOnComplete: true,
@@ -112,6 +139,7 @@ export class QueueService implements OnModuleInit {
   // ==================== Search ====================
 
   async indexTour(data: { tourId: string; action: 'create' | 'update' | 'delete' }) {
+    if (!this.checkRedis()) return;
     return this.searchIndexQueue.add(JobNames.INDEX_TOUR, data, {
       attempts: 3,
       removeOnComplete: true,
@@ -119,6 +147,7 @@ export class QueueService implements OnModuleInit {
   }
 
   async reindexAll() {
+    if (!this.checkRedis()) return;
     return this.searchIndexQueue.add(JobNames.REINDEX_ALL, {}, {
       attempts: 1,
       removeOnComplete: true,
@@ -133,14 +162,16 @@ export class QueueService implements OnModuleInit {
     endDate: string;
     userId?: string;
   }) {
+    if (!this.checkRedis()) return;
     return this.analyticsQueue.add(JobNames.GENERATE_REPORT, data, {
       attempts: 3,
       removeOnComplete: false,
-      timeout: 60000, // 1 минута
+      timeout: 60000,
     });
   }
 
   async aggregateStats() {
+    if (!this.checkRedis()) return;
     return this.analyticsQueue.add(JobNames.AGGREGATE_STATS, {}, {
       attempts: 3,
       removeOnComplete: true,
@@ -150,6 +181,7 @@ export class QueueService implements OnModuleInit {
   // ==================== File Upload ====================
 
   async processImage(data: { fileId: string; operations: string[] }) {
+    if (!this.checkRedis()) return;
     return this.fileUploadQueue.add(JobNames.PROCESS_IMAGE, data, {
       attempts: 3,
       removeOnComplete: true,
@@ -161,6 +193,7 @@ export class QueueService implements OnModuleInit {
     widths: number[];
     format: 'jpeg' | 'png' | 'webp';
   }) {
+    if (!this.checkRedis()) return;
     return this.fileUploadQueue.add(JobNames.RESIZE_IMAGE, data, {
       attempts: 3,
       removeOnComplete: true,
@@ -170,6 +203,8 @@ export class QueueService implements OnModuleInit {
   // ==================== Stats ====================
 
   async getQueueStats() {
+    if (!this.checkRedis()) return [];
+
     const queues = [
       this.emailQueue,
       this.paymentQueue,
@@ -194,7 +229,9 @@ export class QueueService implements OnModuleInit {
   }
 
   private async logQueueStats() {
+    if (!this.checkRedis()) return;
     const stats = await this.getQueueStats();
+    if (!stats || stats.length === 0) return;
     stats.forEach((stat) => {
       this.logger.log(
         `Queue ${stat.name}: waiting=${stat.waiting}, active=${stat.active}, completed=${stat.completed}, failed=${stat.failed}`
@@ -203,6 +240,8 @@ export class QueueService implements OnModuleInit {
   }
 
   async cleanQueues() {
+    if (!this.checkRedis()) return;
+
     const queues = [
       this.emailQueue,
       this.paymentQueue,

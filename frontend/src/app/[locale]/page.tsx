@@ -20,9 +20,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toursApi } from '@/lib/api';
-import { formatPrice, getCategoryLabel } from '@/lib/utils';
+import { formatPrice, getCategoryLabel, getMediaUrl } from '@/lib/utils';
 import { getLocalizedTour } from '@/lib/utils/translate-tour';
 import type { Tour } from '@/lib/api';
+import TourChatWidget from '@/components/chat/TourChatWidget';
 
 export default function HomePage() {
   const [featuredTours, setFeaturedTours] = useState<Tour[]>([]);
@@ -208,7 +209,7 @@ export default function HomePage() {
                     <div className="relative h-48 bg-gradient-to-br from-blue-500 to-purple-500">
                       {tour.media && tour.media.length > 0 ? (
                         <img
-                          src={tour.media[0].url}
+                          src={getMediaUrl(tour.media[0].url)}
                           alt={tour.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -218,8 +219,16 @@ export default function HomePage() {
                         </div>
                       )}
                       <Badge className="absolute top-3 left-3">
-                        {getCategoryLabel(tour.category)}
+                        {getCategoryLabel(tour.category, locale)}
                       </Badge>
+                      {tour.media && tour.media.length > 1 && (
+                        <span className="absolute bottom-3 left-3 bg-black/55 text-white text-[11px] font-medium px-2 py-0.5 rounded-full">
+                          +{tour.media.length} фото
+                        </span>
+                      )}
+                      <div className="absolute top-3 right-3">
+                        <TourChatWidget tour={tour} variant="icon" />
+                      </div>
                     </div>
                     <CardContent className="p-4">
                       <div className="flex items-center text-sm text-gray-500 mb-2">

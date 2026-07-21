@@ -1,4 +1,4 @@
-import { Module, Global } from '@nestjs/common';
+import { Module, Global, Logger } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { QueueService } from './queue.service';
@@ -7,17 +7,19 @@ import { PaymentProcessor } from './processors/payment.processor';
 import { NotificationProcessor } from './processors/notification.processor';
 import { getQueueConfig, QueueNames } from '../../core/config/queue.config';
 
+const logger = new Logger('QueueModule');
+
 @Global()
 @Module({
   imports: [
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        return getQueueConfig(
-          configService.get<string>('REDIS_HOST', 'localhost'),
-          configService.get<number>('REDIS_PORT', 6379),
-          configService.get<string>('REDIS_PASSWORD'),
-        );
+        const redisHost = configService.get<string>('REDIS_HOST', 'localhost');
+        const redisPort = configService.get<number>('REDIS_PORT', 6379);
+        const redisPassword = configService.get<string>('REDIS_PASSWORD');
+        logger.log(`Queue Redis config: ${redisHost}:${redisPort} (lazy connect)`);
+        return getQueueConfig(redisHost, redisPort, redisPassword);
       },
       inject: [ConfigService],
     }),

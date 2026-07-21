@@ -39,7 +39,7 @@ export default function RegisterPage() {
 
     try {
       const response = await authApi.register(formData);
-      localStorage.setItem('tokens', JSON.stringify(response.tokens));
+      localStorage.setItem('tokens', JSON.stringify({ accessToken: response.accessToken, refreshToken: response.refreshToken }));
       localStorage.setItem('user', JSON.stringify(response.user));
       setUser(response.user);
       router.push(`/${locale}/dashboard`);
@@ -148,7 +148,7 @@ export default function RegisterPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               {t('hasAccount')}{' '}
-              <Link href={`/${locale}/auth/login`} className="text-blue-600 hover:underline font-medium">
+              <Link href={`/${locale}/auth/login`} className="text-primary-700 hover:underline font-medium">
                 {t('signIn')}
               </Link>
             </p>

@@ -107,7 +107,7 @@ export default function BookingPage() {
   if (!tour) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+        <div className="animate-spin h-8 w-8 border-4 border-primary-800 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -128,11 +128,11 @@ export default function BookingPage() {
               {[1, 2, 3].map((s) => (
                 <React.Fragment key={s}>
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                    step >= s ? 'bg-primary-800 text-white' : 'bg-gray-200 text-gray-600'
                   }`}>
                     {step > s ? <Check className="h-5 w-5" /> : s}
                   </div>
-                  {s < 3 && <div className={`flex-1 h-1 mx-2 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />}
+                  {s < 3 && <div className={`flex-1 h-1 mx-2 ${step > s ? 'bg-primary-800' : 'bg-gray-200'}`} />}
                 </React.Fragment>
               ))}
             </div>
@@ -266,7 +266,7 @@ export default function BookingPage() {
                   <div className="border-t pt-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">{t('total')}</span>
-                      <span className="font-bold text-xl text-blue-600">${calculateTotal()}</span>
+                      <span className="font-bold text-xl text-primary-700">${calculateTotal()}</span>
                     </div>
                   </div>
                 </div>

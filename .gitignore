@@ -1,0 +1,86 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+C:/temp/
+
+# PostgreSQL local data (stored in project for dev)
+pgdata/
+
+# Database backups
+nicat-backup.sql
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Uploads (user-uploaded files)
+uploads/
+!uploads/.gitkeep
+
+# Next.js frontend
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# Docker
+docker-compose.override.yml
+
+# Freebuff workspace
+.freebuff/
+
+# Temp scripts & test files
+check-*.js
+fix-*.js
+add-*.js
+setup-db.cmd
+stop-dev*.cmd
+start-dev-full.cmd
+test-upload.jpg
+nul
+*.patch
+
+# SQL dumps
+tours_backup.sql
+seed-all-tours.sql
+seed-photos*.sql
+seed-tours-20.sql
+add-tour-photos.sql
+
+# Next.js frontend
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Uploads (user-uploaded files)
+uploads/
+!uploads/.gitkeep

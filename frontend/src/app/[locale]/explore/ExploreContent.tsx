@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Search, Filter, MapPin, Star, Compass, X, Users, Clock } from 'lucide-react';
@@ -8,26 +8,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toursApi } from '@/lib/api';
-import { formatPrice, getCategoryLabel } from '@/lib/utils';
+import { formatPrice, getCategoryLabel, getMediaUrl } from '@/lib/utils';
 import { getLocalizedTour } from '@/lib/utils/translate-tour';
+import { serviceCategories, getLocalizedName } from '@/lib/data/filters';
 import type { Tour } from '@/lib/api';
 import Link from 'next/link';
 import FilterSidebar from '@/components/filters/FilterSidebar';
-
-const durations = [
-  { label: '1-3', value: '1-3' },
-  { label: '4-7', value: '4-7' },
-  { label: '8-14', value: '8-14' },
-  { label: '15+', value: '15+' },
-];
-
-const priceRanges = [
-  { label: '<$100', value: '0-100' },
-  { label: '$100-$300', value: '100-300' },
-  { label: '$300-$500', value: '300-500' },
-  { label: '$500-$1000', value: '500-1000' },
-  { label: '$1000+', value: '1000-99999' },
-];
+import TourChatWidget from '@/components/chat/TourChatWidget';
 
 export default function ExploreContent() {
   const searchParams = useSearchParams();
@@ -41,15 +28,19 @@ export default function ExploreContent() {
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [totalResults, setTotalResults] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 9;
 
   const t = useTranslations('explore');
   const tCommon = useTranslations('common');
   const locale = useLocale();
 
-  const fetchTours = async () => {
+  const totalPages = Math.max(1, Math.ceil(totalResults / PAGE_SIZE));
+
+  const fetchTours = async (page: number) => {
     setIsLoading(true);
     try {
-      const params: Record<string, unknown> = {};
+      const params: Record<string, unknown> = { page, limit: PAGE_SIZE };
       if (searchQuery) params.q = searchQuery;
       if (selectedCountries.length) params.countries = selectedCountries.join(',');
       if (selectedCities.length) params.cities = selectedCities.join(',');
@@ -66,8 +57,8 @@ export default function ExploreContent() {
       }
 
       const result = await toursApi.search(params);
-      setTours(Array.isArray(result) ? result : []);
-      setTotalResults(Array.isArray(result) ? result.length : 0);
+      setTours(result.tours);
+      setTotalResults(result.total);
     } catch (err) {
       console.error(err);
       setTours([]);
@@ -76,9 +67,19 @@ export default function ExploreContent() {
     }
   };
 
+  // Reset to page 1 when filters change, then fetch
+  const filtersKey = `${searchQuery}|${selectedCountries.join(',')}|${selectedCities.join(',')}|${selectedServices.join(',')}|${selectedDuration}|${selectedPrice}`;
+  const prevFiltersKeyRef = useRef(filtersKey);
+
   useEffect(() => {
-    fetchTours();
-  }, [searchQuery, selectedCountries, selectedCities, selectedServices, selectedDuration, selectedPrice]);
+    if (prevFiltersKeyRef.current !== filtersKey) {
+      prevFiltersKeyRef.current = filtersKey;
+      setCurrentPage(1);
+      fetchTours(1);
+      return;
+    }
+    fetchTours(currentPage);
+  }, [filtersKey, currentPage]);
 
   const clearFilters = () => {
     setSelectedCountries([]);
@@ -111,6 +112,10 @@ export default function ExploreContent() {
                 onCitiesChange={setSelectedCities}
                 selectedServices={selectedServices}
                 onServicesChange={setSelectedServices}
+                selectedDuration={selectedDuration}
+                onDurationChange={setSelectedDuration}
+                selectedPrice={selectedPrice}
+                onPriceChange={setSelectedPrice}
                 onReset={clearFilters}
               />
             </div>
@@ -124,6 +129,10 @@ export default function ExploreContent() {
               onCitiesChange={setSelectedCities}
               selectedServices={selectedServices}
               onServicesChange={setSelectedServices}
+              selectedDuration={selectedDuration}
+              onDurationChange={setSelectedDuration}
+              selectedPrice={selectedPrice}
+              onPriceChange={setSelectedPrice}
               onReset={clearFilters}
             />
           </aside>
@@ -147,44 +156,21 @@ export default function ExploreContent() {
               />
             </div>
 
-            <div className="flex flex-wrap gap-2 mb-6">
-              <span className="text-sm font-medium text-gray-700">{t('filters.duration')}:</span>
-              {durations.map((d) => (
-                <button
-                  key={d.value}
-                  onClick={() => setSelectedDuration(selectedDuration === d.value ? null : d.value)}
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    selectedDuration === d.value ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {d.label} {t('filters.daysUnit')}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap gap-2 mb-6">
-              <span className="text-sm font-medium text-gray-700">{t('filters.priceRange')}:</span>
-              {priceRanges.map((p) => (
-                <button
-                  key={p.value}
-                  onClick={() => setSelectedPrice(selectedPrice === p.value ? null : p.value)}
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    selectedPrice === p.value ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-
             {selectedServices.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-6">
-                {selectedServices.map((service) => (
-                  <Badge key={service} variant="secondary" className="gap-1">
-                    {service}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedServices(selectedServices.filter((s) => s !== service))} />
-                  </Badge>
-                ))}
+                {selectedServices.map((serviceId) => {
+                  let serviceName = serviceId;
+                  for (const cat of serviceCategories) {
+                    const found = cat.services.find((s) => s.id === serviceId);
+                    if (found) { serviceName = getLocalizedName(found, locale); break; }
+                  }
+                  return (
+                    <Badge key={serviceId} variant="secondary" className="gap-1">
+                      {serviceName}
+                      <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedServices(selectedServices.filter((s) => s !== serviceId))} />
+                    </Badge>
+                  );
+                })}
               </div>
             )}
 
@@ -210,7 +196,7 @@ export default function ExploreContent() {
                       <div className="relative h-48 bg-gradient-to-br from-blue-500 to-purple-500">
                         {tour.media && tour.media.length > 0 ? (
                           <img
-                            src={tour.media[0].url}
+                            src={getMediaUrl(tour.media[0].url)}
                             alt={localized.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
@@ -219,11 +205,24 @@ export default function ExploreContent() {
                             <Compass className="h-16 w-16 text-white/50" />
                           </div>
                         )}
+                        {tour.media && tour.media.length > 1 && (
+                          <span className="absolute bottom-2 left-2 bg-black/55 text-white text-[11px] font-medium px-2 py-0.5 rounded-full">
+                            +{tour.media.length} {t('photosUnit')}
+                          </span>
+                        )}
+                        <div className="absolute top-2 right-2">
+                          <TourChatWidget tour={tour} variant="icon" />
+                        </div>
                       </div>
                       <CardContent className="p-4">
                         <div className="flex items-center text-sm text-gray-500 mb-2">
                           <MapPin className="h-4 w-4 mr-1" />
                           {localized.city}, {localized.country}
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="secondary" className="text-[11px]">
+                            {getCategoryLabel(tour.category, locale)}
+                          </Badge>
                         </div>
                         <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                           {localized.title}
@@ -250,6 +249,52 @@ export default function ExploreContent() {
               <div className="text-center py-12">
                 <Compass className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                 <p className="text-gray-500">{t('noResults')}</p>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-10">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                >
+                  ←
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                  .reduce<(number | string)[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && typeof arr[idx - 1] === 'number' && (p as number) - (arr[idx - 1] as number) > 1) {
+                      acc.push('...');
+                    }
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((item, idx) =>
+                    typeof item === 'string' ? (
+                      <span key={`ellipsis-${idx}`} className="px-2 text-gray-400">...</span>
+                    ) : (
+                      <Button
+                        key={item}
+                        variant={currentPage === item ? 'default' : 'outline'}
+                        size="sm"
+                        className={currentPage === item ? 'bg-primary-800 text-white' : ''}
+                        onClick={() => setCurrentPage(item)}
+                      >
+                        {item}
+                      </Button>
+                    )
+                  )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  →
+                </Button>
               </div>
             )}
           </main>

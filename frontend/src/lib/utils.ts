@@ -59,21 +59,22 @@ export function getStatusLabel(status: string): string {
   return labels[status] || status;
 }
 
-export function getCategoryLabel(category: string): string {
-  const labels: Record<string, string> = {
-    adventure: 'Adventure',
-    cultural: 'Cultural',
-    nature: 'Nature',
-    city: 'City',
-    beach: 'Beach',
-    food: 'Food & Wine',
-    photography: 'Photography',
-    wellness: 'Wellness',
-    family: 'Family',
-    luxury: 'Luxury',
-    budget: 'Budget',
+export function getCategoryLabel(category: string, locale?: string): string {
+  const labels: Record<string, Record<string, string>> = {
+    adventure: { en: 'Adventure', ru: 'Приключения', az: 'Macəra' },
+    cultural: { en: 'Cultural', ru: 'Культура', az: 'Mədəniyyət' },
+    nature: { en: 'Nature', ru: 'Природа', az: 'Təbiət' },
+    city: { en: 'City', ru: 'Город', az: 'Şəhər' },
+    beach: { en: 'Beach', ru: 'Пляж', az: 'Çimərlik' },
+    food: { en: 'Food & Wine', ru: 'Еда и вино', az: 'Yemək və şərab' },
+    photography: { en: 'Photography', ru: 'Фотография', az: 'Fotoqrafiya' },
+    wellness: { en: 'Wellness', ru: 'Отдых и здоровье', az: 'Sağlamlıq' },
+    family: { en: 'Family', ru: 'Семейный', az: 'Ailə' },
+    luxury: { en: 'Luxury', ru: 'Люкс', az: 'Lüks' },
+    budget: { en: 'Budget', ru: 'Бюджетный', az: 'Büdcəli' },
   };
-  return labels[category] || category;
+  const loc = locale?.startsWith('ru') ? 'ru' : locale?.startsWith('az') ? 'az' : 'en';
+  return labels[category]?.[loc] || labels[category]?.['en'] || category;
 }
 
 export function getDifficultyLabel(difficulty: string): string {
@@ -99,4 +100,24 @@ export function generateBookingReference(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   return `NC-${timestamp}-${random}`;
+}
+
+/**
+ * Resolves a media URL to be usable in the browser.
+ * If the URL is already absolute (starts with http/https), returns it as-is.
+ * If it's a relative path (e.g. /uploads/uuid.png), uses the current origin
+ * so the request goes through Next.js rewrites (/uploads/:path* → backend).
+ * This ensures photos work both on localhost and via network IP.
+ */
+export function getMediaUrl(url: string): string {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  // For relative URLs, use current origin so Next.js rewrite handles proxying
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
+  }
+  // SSR fallback — use localhost with the backend port
+  return `http://localhost:3000${url.startsWith('/') ? url : `/${url}`}`;
 }

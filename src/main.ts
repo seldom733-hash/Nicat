@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as express from 'express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -70,6 +71,9 @@ async function bootstrap() {
     type: 'application/json',
     verify: (req: any, _res: any, buf: Buffer) => { req.rawBody = buf; },
   }));
+
+  // Static file serving for uploaded media
+  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
   // Global prefix
   app.setGlobalPrefix('api/v1');

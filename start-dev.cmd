@@ -7,12 +7,26 @@ setlocal enabledelayedexpansion
 
 set BACKEND_PORT=3000
 set FRONTEND_PORT=3001
+set PGDATA=%~dp0pgdata
+set PG_BIN="C:\Program Files\PostgreSQL\18\bin"
 set HEALTH_CHECK_URL=http://localhost:%BACKEND_PORT%/api/v1/health
 set HEALTH_CHECK_TIMEOUT=30
 
 echo ============================================
 echo  Nicat Dev Server - Starting...
 echo ============================================
+echo.
+
+REM --- Start local PostgreSQL from project pgdata/ ---
+%PG_BIN%\pg_ctl.exe -D "%PGDATA%" status >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [INFO] Starting local PostgreSQL from pgdata/ on port 5433...
+    %PG_BIN%\pg_ctl.exe -D "%PGDATA%" -l "%PGDATA%\logfile" start
+    timeout /t 3 /nobreak >nul
+    echo [SUCCESS] Local PostgreSQL started on port 5433
+) else (
+    echo [INFO] Local PostgreSQL is already running on port 5433
+)
 echo.
 
 REM Check if ports are already in use
@@ -22,8 +36,9 @@ if %errorlevel% equ 0 (
 )
 
 REM Start Backend
-echo [INFO] Starting Backend (NestJS) on port %BACKEND_PORT%...
-start "Nicat Backend" cmd /c "cd /d "%~dp0" && npm run start:dev > C:\temp\nicat-backend.log 2>&1"
+set DB_PORT=5433
+echo [INFO] Starting Backend (NestJS) on port %BACKEND_PORT% (DB port 5433)...
+start "Nicat Backend" cmd /c "cd /d "%~dp0" && set DB_PORT=5433 && npm run start:dev > C:\temp\nicat-backend.log 2>&1"
 
 REM Wait for backend to be ready
 echo [INFO] Waiting for backend to be ready...

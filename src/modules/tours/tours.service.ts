@@ -27,7 +27,7 @@ export class ToursService {
     const tour = this.tourRepository.create({
       ...tourData,
       hostId: host.id,
-      status: TourStatus.DRAFT,
+      status: TourStatus.ACTIVE,
     });
 
     const savedTour = await this.tourRepository.save(tour);
@@ -210,7 +210,7 @@ export class ToursService {
     }
 
     const page = searchDto.page || 1;
-    const limit = searchDto.limit || 10;
+    const limit = searchDto.limit || 9;
     const sortBy = searchDto.sortBy || 'createdAt';
     const sortOrder = searchDto.sortOrder || 'DESC';
 

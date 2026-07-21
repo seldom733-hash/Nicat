@@ -1,16 +1,13 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 
 // Dynamic API base URL - resolved at request time, not module load time
-// This ensures the phone's IP is used when accessing from a different device
+// Uses Next.js rewrites so requests go through the same origin (avoids CORS issues)
 const getApiBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    return `http://${hostname}:3000/api/v1`;
-  }
-  return 'http://localhost:3000/api/v1';
+  // Use relative URL - Next.js rewrites proxy /api/* to the backend
+  return '/api/v1';
 };
 
 interface ApiResponse<T> {
@@ -268,7 +265,9 @@ api.interceptors.response.use(
         }
       } catch {
         localStorage.removeItem('tokens');
-        window.location.href = '/auth/login';
+        localStorage.removeItem('user');
+        const locale = window.location.pathname.split('/')[1] || 'en';
+        window.location.href = `/${locale}/auth/login`;
       }
     }
 
@@ -311,11 +310,12 @@ export const authApi = {
 // ==================== Tours API ====================
 
 export const toursApi = {
-  search: async (params: SearchParams) => {
+  search: async (params: SearchParams): Promise<{ tours: Tour[]; total: number }> => {
     const response = await api.get('/tours', { params });
     const d = unwrap(response);
-    if (d && d.tours) return d.tours;
-    return Array.isArray(d) ? d : [];
+    if (d && d.tours) return { tours: d.tours, total: d.total || d.tours.length };
+    if (Array.isArray(d)) return { tours: d, total: d.length };
+    return { tours: [], total: 0 };
   },
 
   getById: async (id: string) => {
@@ -355,6 +355,17 @@ export const toursApi = {
 
   delete: async (id: string) => {
     await api.delete(`/tours/${id}`);
+  },
+
+  uploadMedia: async (files: File[]): Promise<{ url: string; caption?: string }[]> => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+    const response = await api.post('/tours/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return unwrap(response);
   },
 };
 

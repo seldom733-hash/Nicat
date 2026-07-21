@@ -40,7 +40,7 @@ export default function LanguageSwitcher() {
           disabled={isPending}
           className={`px-2 py-1 rounded-md text-xs font-medium transition-all ${
             currentLocale === locale
-              ? 'bg-white text-blue-600 shadow-sm'
+              ? 'bg-white text-primary-700 shadow-sm'
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
           } ${isPending ? 'opacity-50' : ''}`}
         >
