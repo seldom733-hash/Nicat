@@ -137,9 +137,11 @@ export class ToursService {
     query.where('tour.status = :status', { status: TourStatus.ACTIVE });
 
     if (searchDto.q) {
+      const q = searchDto.q.trim();
+      // First try to match country/city/title (primary fields)
       query.andWhere(
-        '(tour.title ILIKE :q OR tour.city ILIKE :q OR tour.country ILIKE :q OR tour.description ILIKE :q)',
-        { q: `%${searchDto.q}%` },
+        '(tour.title ILIKE :q OR tour.city ILIKE :q OR tour.country ILIKE :q)',
+        { q: `%${q}%` },
       );
     }
 
