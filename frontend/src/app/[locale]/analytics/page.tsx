@@ -366,7 +366,7 @@ export default function AnalyticsPage() {
                           </span>
                         </td>
                         <td className="text-right py-3 px-2">
-                          <span className="text-yellow-500">★</span> {tour.averageRating?.toFixed(1) || '—'}
+                          <span className="text-yellow-500">★</span> {tour.averageRating ? Number(tour.averageRating).toFixed(1) : '—'}
                           <span className="text-gray-400 ml-1">({tour.reviewCount})</span>
                         </td>
                       </tr>
