@@ -52,6 +52,18 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Check if a port is in use
+is_port_in_use() {
+    local port=$1
+    if command -v netstat &> /dev/null; then
+        netstat -ano | findstr ":${port}" | findstr "LISTENING" > /dev/null 2>&1
+    elif command -v lsof &> /dev/null; then
+        lsof -i:${port} > /dev/null 2>&1
+    else
+        curl -s "http://localhost:${port}" > /dev/null 2>&1
+    fi
+}
+
 # Check if Redis is running and start if needed
 start_redis() {
     if is_port_in_use 6379; then
@@ -87,18 +99,6 @@ start_redis() {
     log_warning "Redis not found. Install redis-server or Docker, or start Redis manually."
     log_warning "Queues (email, payments, notifications) will not work without Redis."
     return 0
-}
-
-# Check if a port is in use
-is_port_in_use() {
-    local port=$1
-    if command -v netstat &> /dev/null; then
-        netstat -ano | findstr ":${port}" | findstr "LISTENING" > /dev/null 2>&1
-    elif command -v lsof &> /dev/null; then
-        lsof -i:${port} > /dev/null 2>&1
-    else
-        curl -s "http://localhost:${port}" > /dev/null 2>&1
-    fi
 }
 
 # Wait for backend to be ready
