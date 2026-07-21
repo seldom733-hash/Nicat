@@ -186,6 +186,8 @@ async function seed() {
             firstName: pg.firstName,
             lastName: pg.lastName,
             passportNumber: `P${randomInt(1000000, 9999999)}`,
+            dateOfBirth: new Date(1970 + randomInt(0, 30), randomInt(0, 11), randomInt(1, 28)),
+            isLeadPassenger: p === 0,
           });
           await passengerRepo.save(passenger);
         }
